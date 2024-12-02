@@ -18,4 +18,4 @@ application:
       secret-key: 586B633834416E396D7436753879382F423F4428482B4C6250655367566B5970
       expiration: 900000 #  15 min in ms
       refresh-token:
-        expiration: 1296000000 # 15 days in ms
+        expiration: 1296000 # 15 days in ms

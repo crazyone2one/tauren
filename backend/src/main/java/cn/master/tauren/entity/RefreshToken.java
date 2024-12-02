@@ -50,7 +50,7 @@ public class RefreshToken implements Serializable {
      * refresh token值
      */
     private String token;
-    private long expiryDate;
+    private LocalDateTime expiryDate;
 
     /**
      * 创建时间
