@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <option name="BUILD_PROCESS_ADDITIONAL_VM_OPTIONS" value="-Djps.track.ap.dependencies=false" />
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="backend" />
         <module name="frontend" />
+      </profile>
+      <profile name="Annotation profile for tauren" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="F:/repository/com/mybatis-flex/mybatis-flex-processor/1.10.2/mybatis-flex-processor-1.10.2.jar" />
+          <entry name="F:/repository/com/mybatis-flex/mybatis-flex-annotation/1.10.2/mybatis-flex-annotation-1.10.2.jar" />
+          <entry name="F:/repository/org/mybatis/mybatis/3.5.17/mybatis-3.5.17.jar" />
+          <entry name="F:/repository/com/mybatis-flex/mybatis-flex-processor/1.10.2/mybatis-flex-processor-1.10.2.jar" />
+          <entry name="F:/repository/com/mybatis-flex/mybatis-flex-annotation/1.10.2/mybatis-flex-annotation-1.10.2.jar" />
+          <entry name="F:/repository/org/mybatis/mybatis/3.5.17/mybatis-3.5.17.jar" />
+          <entry name="F:/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="backend" />
       </profile>
     </annotationProcessing>
   </component>
