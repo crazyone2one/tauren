@@ -1,12 +1,12 @@
 spring:
   # Quartz 的配置，对应 QuartzProperties 配置类
-  quartz:
-    # 程序结束时会等待quartz相关的内容结束
-    wait-for-jobs-to-complete-on-shutdown: true
-    # 将任务等保存化到数据库
-    job-store-type: jdbc
-    # QuartzScheduler启动时覆盖己存在的Job
-    overwrite-existing-jobs: false
+#  quartz:
+#    # 程序结束时会等待quartz相关的内容结束
+#    wait-for-jobs-to-complete-on-shutdown: true
+#    # 将任务等保存化到数据库
+#    job-store-type: jdbc
+#    # QuartzScheduler启动时覆盖己存在的Job
+#    overwrite-existing-jobs: false
 
   # DataSource Config
   datasource:
