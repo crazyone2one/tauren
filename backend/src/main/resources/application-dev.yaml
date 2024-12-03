@@ -1,7 +1,13 @@
 spring:
+  # Quartz 的配置，对应 QuartzProperties 配置类
   quartz:
-    jdbc:
-      initialize-schema: always
+    # 程序结束时会等待quartz相关的内容结束
+    wait-for-jobs-to-complete-on-shutdown: true
+    # 将任务等保存化到数据库
+    job-store-type: jdbc
+    # QuartzScheduler启动时覆盖己存在的Job
+    overwrite-existing-jobs: false
+
   # DataSource Config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -12,10 +18,14 @@ spring:
       pool-name: HikariCP
       connection-test-query: SELECT 1
 
+logging:
+  level:
+    root: info
+
 application:
   security:
     jwt:
       secret-key: 586B633834416E396D7436753879382F423F4428482B4C6250655367566B5970
-      expiration: 900000 #  15 min in ms
+      expiration: 3600000 #  1h in ms
       refresh-token:
         expiration: 1296000 # 15 days in ms
