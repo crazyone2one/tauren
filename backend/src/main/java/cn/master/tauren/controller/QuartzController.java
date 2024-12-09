@@ -1,15 +1,20 @@
 package cn.master.tauren.controller;
 
-import cn.master.tauren.entity.JobBean;
-import cn.master.tauren.job.SampleJob;
+import cn.master.tauren.constants.CommonConstants;
+import cn.master.tauren.entity.QuartzJob;
+import cn.master.tauren.payload.request.BasePageRequest;
+import cn.master.tauren.ret.ResultHolder;
 import cn.master.tauren.service.PersonnelRealTimeBehavior;
-import cn.master.tauren.util.JobUtils;
+import cn.master.tauren.service.QuartzJobService;
+import cn.master.tauren.util.CronUtils;
+import com.mybatisflex.core.paginate.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.quartz.Scheduler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.commons.lang3.StringUtils;
+import org.quartz.SchedulerException;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Created by 11's papa on 12/02/2024
@@ -17,48 +22,83 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/quartz")
 @RequiredArgsConstructor
+@Tag(name = "任务管理")
 public class QuartzController {
     private final PersonnelRealTimeBehavior personnelRealTimeBehavior;
-    private final Scheduler scheduler;
+    private final QuartzJobService quartzJobService;
 
-    private final String jobName = "sampleJob";
-
-    @GetMapping("/create")
-    public String createJob() {
-        JobBean jobBean = new JobBean(jobName, SampleJob.class.getName(), "0/2 * * * * ?");
-        JobUtils.createJob(scheduler, jobBean);
-        return "create success";
+    @PostMapping("/create")
+    @Operation(description = "创建定时任务")
+    public ResultHolder createJob(@RequestBody QuartzJob job) {
+        if (!CronUtils.isValid(job.getCronExpression())) {
+            return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，Cron表达式不正确", null);
+        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), CommonConstants.LOOKUP_RMI)) {
+            return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi://'调用", null);
+        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), CommonConstants.LOOKUP_LDAP)) {
+            return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'ldap://'调用", null);
+        } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(),
+                new String[]{CommonConstants.HTTP, CommonConstants.HTTPS})) {
+            return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'http(s)//'调用", null);
+        } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), CommonConstants.JOB_ERROR_STR)) {
+            return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串存在违规", null);
+        }
+        return ResultHolder.success(quartzJobService.insertJob(job), "任务创建成功");
     }
 
     @GetMapping("/pause")
     public String pauseJob() {
-        JobUtils.pauseJob(scheduler, jobName);
+        //ScheduleUtils.pauseJob(scheduler, jobName);
         return "pause success";
     }
 
     @GetMapping("/resume")
     public String resumeJob() {
-        JobUtils.resumeJob(scheduler, jobName);
+        //ScheduleUtils.resumeJob(scheduler, jobName);
         return "resume success";
     }
 
     @GetMapping("/delete")
     public String deleteJob() {
-        JobUtils.deleteJob(scheduler, jobName);
+        //ScheduleUtils.deleteJob(scheduler, jobName);
         return "delete success";
     }
 
-    @GetMapping("/once")
-    public String runOnceJob() {
-        JobUtils.runJobOnce(scheduler, jobName);
+    @PutMapping("/once")
+    @Operation(description = "立即执行一次")
+    public String runOnceJob(@RequestBody QuartzJob job) throws SchedulerException {
+        quartzJobService.run(job);
         return "once success";
     }
 
-    @GetMapping("/modify")
-    public String modifyJob() {
-        JobBean jobBean = new JobBean(jobName, SampleJob.class.getName(), "0/5 * * * * ?");
-        JobUtils.modifyJob(scheduler, jobBean);
-        return "modify success";
+    @PutMapping("/changeStatus")
+    public ResultHolder changeStatus(@RequestBody QuartzJob job) throws SchedulerException {
+        QuartzJob newJob = quartzJobService.getOneByEntityId(job);
+        newJob.setStatus(job.getStatus());
+        return ResultHolder.success(quartzJobService.changeStatus(newJob));
+    }
+
+    @PutMapping("/modify")
+    @Operation(description = "修改定时任务")
+    public ResultHolder modifyJob(@RequestBody QuartzJob job) throws SchedulerException {
+        if (!CronUtils.isValid(job.getCronExpression())) {
+            return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，Cron表达式不正确", null);
+        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), CommonConstants.LOOKUP_RMI)) {
+            return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi://'调用", null);
+        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), CommonConstants.LOOKUP_LDAP)) {
+            return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'ldap://'调用", null);
+        } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(),
+                new String[]{CommonConstants.HTTP, CommonConstants.HTTPS})) {
+            return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'http(s)//'调用", null);
+        } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), CommonConstants.JOB_ERROR_STR)) {
+            return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串存在违规", null);
+        }
+        return ResultHolder.success(quartzJobService.updateJob(job));
+    }
+
+    @PostMapping("/page")
+    @Operation(summary = "系统设置-系统-用户-分页查找用户")
+    public Page<QuartzJob> page(@Validated @RequestBody BasePageRequest request) {
+        return quartzJobService.getAllJobs(request);
     }
 
     @PostMapping("/gen")

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Created by 11's papa on 12/03/2024
  **/
-@Configuration
+//@Configuration
 public class SchedulerConfig {
     private final String job = "sampleJob";
 
@@ -22,13 +22,13 @@ public class SchedulerConfig {
 
     @Bean
     public Trigger trigger() {
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0/2 * * * * ?");
+        //CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0/2 * * * * ?");
         // 错过的全部补偿，然后正常调度
-        //CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0/5 * * * * ?").withMisfireHandlingInstructionIgnoreMisfires();
+        // CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0/5 * * * * ?").withMisfireHandlingInstructionIgnoreMisfires();
         // 错过的全部合并成一次，并立即补偿，然后正常调度
-        //CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0/5 * * * * ?").withMisfireHandlingInstructionFireAndProceed();
+        // CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0/5 * * * * ?").withMisfireHandlingInstructionFireAndProceed();
         // 错过的不再补偿
-        // CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0/5 * * * * ?").withMisfireHandlingInstructionDoNothing();
+         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/5 * * * ?").withMisfireHandlingInstructionDoNothing();
         return TriggerBuilder.newTrigger()
                 .forJob(jobDetail())
                 .withIdentity(job + "_trigger")

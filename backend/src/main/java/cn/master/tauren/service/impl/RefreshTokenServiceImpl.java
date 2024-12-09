@@ -1,6 +1,7 @@
 package cn.master.tauren.service.impl;
 
-import cn.master.tauren.config.JwtTokenProvider;
+import cn.master.tauren.security.JwtTokenProvider;
+import cn.master.tauren.constants.ResultCode;
 import cn.master.tauren.entity.CustomUser;
 import cn.master.tauren.entity.RefreshToken;
 import cn.master.tauren.entity.User;
@@ -56,11 +57,11 @@ public class RefreshTokenServiceImpl extends ServiceImpl<RefreshTokenMapper, Ref
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (Objects.isNull(token)) {
             log.error("token is null");
-            throw new TokenException(null, "Token is null");
+            throw new TokenException(ResultCode.TOKEN_ERROR_02, ResultCode.TOKEN_ERROR_02.getMessage(), null);
         }
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
             mapper.delete(token);
-            throw new TokenException(token.getToken(), "Refresh token was expired. Please make a new authentication request");
+            throw new TokenException(ResultCode.TOKEN_ERROR_04, "Refresh token was expired. Please make a new authentication request", null);
         }
         return token;
     }
@@ -75,7 +76,7 @@ public class RefreshTokenServiceImpl extends ServiceImpl<RefreshTokenMapper, Ref
         String userId = findByToken(request.getRefreshToken())
                 .map(this::verifyExpiration)
                 .map(RefreshToken::getUserId)
-                .orElseThrow(() -> new TokenException(request.getRefreshToken(), "Refresh token does not exist"));
+                .orElseThrow(() -> new TokenException(ResultCode.TOKEN_ERROR_03, ResultCode.TOKEN_ERROR_03.getMessage(), null));
         CustomUser user = QueryChain.of(User.class).eq(User::getId, userId).oneAs(CustomUser.class);
         String token = jwtTokenProvider.generateToken(user);
         return RefreshTokenResponse.builder().accessToken(token)

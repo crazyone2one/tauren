@@ -12,13 +12,25 @@ spring:
     url: jdbc:mysql://172.16.2.10:3306/tauren?characterEncoding=UTF-8&useInformationSchema=true
     username: root
     password: 3eCrAw8Ba6Tg
+    type: com.zaxxer.hikari.HikariDataSource
     hikari:
-      pool-name: HikariCP
+      maximum-pool-size: 100
+      minimum-idle: 10
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      auto-commit: true
       connection-test-query: SELECT 1
+      pool-name: DatebookHikariCP
 
 logging:
   level:
-    root: info
+    org.springframework: debug
+    org.springframework.security: trace
+
+springdoc:
+  api-docs:
+    enabled: true
 
 application:
   security:

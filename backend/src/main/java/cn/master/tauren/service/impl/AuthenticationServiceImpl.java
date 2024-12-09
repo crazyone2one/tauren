@@ -1,6 +1,6 @@
 package cn.master.tauren.service.impl;
 
-import cn.master.tauren.config.JwtTokenProvider;
+import cn.master.tauren.security.JwtTokenProvider;
 import cn.master.tauren.entity.CustomUser;
 import cn.master.tauren.entity.RefreshToken;
 import cn.master.tauren.entity.User;

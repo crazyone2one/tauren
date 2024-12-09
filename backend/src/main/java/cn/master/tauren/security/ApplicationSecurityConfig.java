@@ -1,4 +1,4 @@
-package cn.master.tauren.config;
+package cn.master.tauren.security;
 
 import cn.master.tauren.entity.CustomUser;
 import cn.master.tauren.entity.User;

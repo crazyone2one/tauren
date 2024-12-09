@@ -1,4 +1,4 @@
-package cn.master.tauren.config;
+package cn.master.tauren.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .accessDeniedHandler(customAccessDeniedHandler)
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint));
         http.authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/swagger-ui.html").permitAll()
                 .anyRequest().authenticated());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authenticationManager(authenticationManager)

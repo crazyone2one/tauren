@@ -1,6 +1,8 @@
-package cn.master.tauren.config;
+package cn.master.tauren.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +19,14 @@ public class JwtTokenProvider {
 
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
-    SecretKey key = Jwts.SIG.HS256.key().build();
+    @Value("${application.security.jwt.secret-key}")
+    private String secret;
+    //SecretKey key = Jwts.SIG.HS256.key().build();
+
+    private SecretKey getKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(UserDetails userDetails) {
         String username = userDetails.getUsername();
@@ -27,12 +36,12 @@ public class JwtTokenProvider {
                 .subject(username)
                 .issuedAt(currentDate)
                 .expiration(expireDate)
-                .signWith(key)
+                .signWith(getKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
     public String getUsername(String token) {
-        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload().getSubject();
+        return extractAllClaims(token).getSubject();
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
@@ -50,7 +59,7 @@ public class JwtTokenProvider {
 
     private Claims extractAllClaims(String token) {
         try {
-            return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+            return Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload();
         } catch (SecurityException | MalformedJwtException e) {
             throw new AuthenticationCredentialsNotFoundException("JWT was expired or incorrect");
         } catch (ExpiredJwtException e) {
