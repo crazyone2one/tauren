@@ -1,6 +1,6 @@
 package cn.master.tauren.controller;
 
-import cn.master.tauren.constants.CommonConstants;
+import cn.master.tauren.constants.Constants;
 import cn.master.tauren.entity.QuartzJob;
 import cn.master.tauren.payload.request.BasePageRequest;
 import cn.master.tauren.ret.ResultHolder;
@@ -32,14 +32,14 @@ public class QuartzController {
     public ResultHolder createJob(@RequestBody QuartzJob job) {
         if (!CronUtils.isValid(job.getCronExpression())) {
             return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，Cron表达式不正确", null);
-        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), CommonConstants.LOOKUP_RMI)) {
+        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_RMI)) {
             return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi://'调用", null);
-        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), CommonConstants.LOOKUP_LDAP)) {
+        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_LDAP)) {
             return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'ldap://'调用", null);
         } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(),
-                new String[]{CommonConstants.HTTP, CommonConstants.HTTPS})) {
+                new String[]{Constants.HTTP, Constants.HTTPS})) {
             return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'http(s)//'调用", null);
-        } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), CommonConstants.JOB_ERROR_STR)) {
+        } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), Constants.JOB_ERROR_STR)) {
             return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串存在违规", null);
         }
         return ResultHolder.success(quartzJobService.insertJob(job), "任务创建成功");
@@ -82,14 +82,14 @@ public class QuartzController {
     public ResultHolder modifyJob(@RequestBody QuartzJob job) throws SchedulerException {
         if (!CronUtils.isValid(job.getCronExpression())) {
             return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，Cron表达式不正确", null);
-        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), CommonConstants.LOOKUP_RMI)) {
+        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_RMI)) {
             return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi://'调用", null);
-        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), CommonConstants.LOOKUP_LDAP)) {
+        } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_LDAP)) {
             return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'ldap://'调用", null);
         } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(),
-                new String[]{CommonConstants.HTTP, CommonConstants.HTTPS})) {
+                new String[]{Constants.HTTP, Constants.HTTPS})) {
             return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'http(s)//'调用", null);
-        } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), CommonConstants.JOB_ERROR_STR)) {
+        } else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), Constants.JOB_ERROR_STR)) {
             return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串存在违规", null);
         }
         return ResultHolder.success(quartzJobService.updateJob(job));

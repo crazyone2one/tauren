@@ -1,5 +1,6 @@
 package cn.master.tauren.util;
 
+import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -11,12 +12,13 @@ import java.util.Map;
  * @author Created by 11's papa on 12/05/2024
  **/
 @Component
-public class SpringUtils implements ApplicationContextAware {
+public class SpringContext implements ApplicationContextAware {
+    @Getter
     private static ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        SpringUtils.applicationContext = applicationContext;
+        SpringContext.applicationContext = applicationContext;
     }
 
     public static <T> T getBean(String beanName) {

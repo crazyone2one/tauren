@@ -32,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import {Na} from "naive-ui";
 
 </script>
 

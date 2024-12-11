@@ -3,13 +3,11 @@ import * as path from "node:path";
 import {defineConfig, loadEnv} from "vite";
 import UnoCSS from 'unocss/vite'
 // https://vite.dev/config/
-export default defineConfig(({mode}) => {
+export default defineConfig(({command, mode}) => {
     // Load env file based on `mode` in the current working directory.
     // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
     const env = loadEnv(mode, process.cwd(), "");
-    console.log(env.APP_ENV);
-
-    return {
+    const config = {
         // vite config
         plugins: [vue(), UnoCSS()],
         server: {
@@ -18,8 +16,8 @@ export default defineConfig(({mode}) => {
                 [env.VITE_APP_BASE_API]: {
                     target: env.VITE_APP_PROXY_URL,
                     changeOrigin: true,
-                    rewrite: (path) =>
-                        path.replace(new RegExp("^" + env.VITE_APP_BASE_API), ""),
+                    rewrite: (path: string) =>
+                        path.replace(new RegExp("^"), ""),
                 },
             },
         },
@@ -45,5 +43,17 @@ export default defineConfig(({mode}) => {
             __APP_ENV__: JSON.stringify(env.APP_ENV),
             __APP_VERSION__: JSON.stringify("v1.0.0"),
         },
-    };
+    }
+    if (command === 'serve') {
+        // dev 独有配置
+        config.server.proxy = {
+            [env.VITE_APP_BASE_API]: {
+                target: env.VITE_APP_PROXY_URL,
+                changeOrigin: true,
+                rewrite: (path: string) =>
+                    path.replace(new RegExp("^" + env.VITE_APP_BASE_API), ""),
+            },
+        }
+    }
+    return config;
 });

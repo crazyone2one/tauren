@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {NButton, NLayout, NLayoutHeader, NLayoutSider, NLayoutFooter, NMenu} from "naive-ui";
+import {NLayout, NLayoutHeader, NLayoutSider, NLayoutFooter, NMenu} from "naive-ui";
 import type {MenuOption} from "naive-ui";
 import useAppStore from "/@/store/app";
 import {RouterLink} from "vue-router";

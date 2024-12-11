@@ -27,15 +27,14 @@ import static cn.master.tauren.util.DateUtils.localDateTime2StringStyle2;
 @Service
 public class PersonnelRealTimeBehaviorImpl implements PersonnelRealTimeBehavior {
     private final static String END_FLAG = "||";
-    LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
 
     /**
      * 领导带班信息
      *
      * @return java.lang.String
      */
-    private String leaderInfo(EmployeeInfo employeeInfo) {
-        return localDateTime2StringStyle2(now) + ";297;" + employeeInfo.getPersonCode() + "/" + employeeInfo.getPersonName() + ";~";
+    private String leaderInfo(EmployeeInfo employeeInfo, LocalDateTime localDateTime) {
+        return localDateTime2StringStyle2(localDateTime) + ";297;" + employeeInfo.getPersonCode() + "/" + employeeInfo.getPersonName() + ";~";
     }
 
     /**
@@ -43,9 +42,9 @@ public class PersonnelRealTimeBehaviorImpl implements PersonnelRealTimeBehavior 
      *
      * @return java.lang.String
      */
-    private String employeeBehaviorInfo(EmployeeInfo employeeInfo) {
+    private String employeeBehaviorInfo(EmployeeInfo employeeInfo, LocalDateTime localDateTime) {
         String empBaseInfo = employeeInfo.getPersonCode() + ";" + employeeInfo.getPersonName() + ";";
-        String inDate = localDateTime2StringStyle2(now);
+        String inDate = localDateTime2StringStyle2(localDateTime);
         StringBuilder content = new StringBuilder();
         content.append(empBaseInfo);
         // 出入井信息
@@ -59,7 +58,7 @@ public class PersonnelRealTimeBehaviorImpl implements PersonnelRealTimeBehavior 
         for (int i = 0; i < count; i++) {
             int randomIndex = ThreadLocalRandom.current().nextInt(areaInfos.size());
             AreaInfo areaInfo = areaInfos.get(randomIndex);
-            content.append(areaInfo.getAreaCode()).append(";").append(localDateTime2StringStyle2(now.plusMinutes(10))).append(";");
+            content.append(areaInfo.getAreaCode()).append(";").append(localDateTime2StringStyle2(localDateTime.plusMinutes(10))).append(";");
             areaInfos.removeIf(next -> next.getAreaCode().equals(areaInfo.getAreaCode()));
         }
         // 行为轨迹分站、时间集合
@@ -83,6 +82,7 @@ public class PersonnelRealTimeBehaviorImpl implements PersonnelRealTimeBehavior 
 
     @Override
     public void genPersonnelFile() {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
         StringBuilder content = new StringBuilder();
         List<EmployeeInfo> employeeInfos = QueryChain.of(EmployeeInfo.class).list();
         // 领导信息
@@ -91,7 +91,7 @@ public class PersonnelRealTimeBehaviorImpl implements PersonnelRealTimeBehavior 
                 .toList();
         int randomLeaderIndex = ThreadLocalRandom.current().nextInt(leaderOfEmployee.size());
         EmployeeInfo leaderEmployeeInfo = leaderOfEmployee.get(randomLeaderIndex);
-        content.append(leaderInfo(leaderEmployeeInfo));
+        content.append(leaderInfo(leaderEmployeeInfo, now));
         // 员工信息
         Random random = new Random();
         int empCount = random.nextInt(50);
@@ -105,7 +105,7 @@ public class PersonnelRealTimeBehaviorImpl implements PersonnelRealTimeBehavior 
             if (flag) {
                 continue;
             }
-            content.append(employeeBehaviorInfo(employeeInfo));
+            content.append(employeeBehaviorInfo(employeeInfo, now));
             // 拼装之后将该员工从tmp中移除
             employeeInfos.removeIf(next -> next.getPersonCode().equals(employeeInfo.getPersonCode()));
         }

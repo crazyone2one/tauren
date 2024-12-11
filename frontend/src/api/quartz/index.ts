@@ -6,3 +6,4 @@ export const fetchQuartzTaskPage = (params: ITableQueryParams) => {
 }
 export const runTask = (params: IJob) => request.Put('/quartz/once', params)
 export const createTask = (params: IJob) => request.Post('/quartz/create', params)
+export const modifyTask = (params: IJob) => request.Post('/quartz/modify', params)

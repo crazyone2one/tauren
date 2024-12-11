@@ -4,7 +4,7 @@ import cn.master.tauren.constants.ScheduleConstants;
 import cn.master.tauren.entity.QuartzJob;
 import cn.master.tauren.entity.QuartzJobLog;
 import cn.master.tauren.mapper.QuartzJobLogMapper;
-import cn.master.tauren.util.SpringUtils;
+import cn.master.tauren.util.SpringContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.Job;
@@ -64,7 +64,7 @@ public abstract class AbstractQuartzJob implements Job {
         } else {
             quartzJobLog.setStatus("0");
         }
-        QuartzJobLogMapper quartzJobLogMapper = SpringUtils.getBean(QuartzJobLogMapper.class);
+        QuartzJobLogMapper quartzJobLogMapper = SpringContext.getBean(QuartzJobLogMapper.class);
         quartzJobLogMapper.insert(quartzJobLog);
     }
 

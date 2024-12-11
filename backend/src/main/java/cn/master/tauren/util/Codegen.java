@@ -40,7 +40,7 @@ public class Codegen {
         //设置表前缀和只生成哪些表，setGenerateTable 未配置时，生成所有表
         globalConfig.getStrategyConfig()
                 .setTablePrefix("tb_")
-                .setGenerateTable("tb_quartz_job_log");
+                .setGenerateTable("tb_precipitation");
 
         //设置生成 entity 并启用 Lombok
         globalConfig.enableEntity()
@@ -56,12 +56,12 @@ public class Codegen {
         ColumnConfig columnConfig = new ColumnConfig();
         columnConfig.setColumnName("create_time");
         columnConfig.setOnInsertValue("now()");
-        globalConfig.setColumnConfig("tb_quartz_job_log", columnConfig);
+        globalConfig.setColumnConfig("tb_precipitation", columnConfig);
         ColumnConfig updateDateConfig = new ColumnConfig();
         updateDateConfig.setColumnName("update_time");
         updateDateConfig.setOnInsertValue("now()");
         updateDateConfig.setOnUpdateValue("now()");
-        //globalConfig.setColumnConfig("tb_qrtz_job", updateDateConfig);
+        globalConfig.setColumnConfig("tb_precipitation", updateDateConfig);
         globalConfig.getJavadocConfig().setAuthor("11's papa").setSince("1.0.0 " + LocalDate.now());
         return globalConfig;
     }

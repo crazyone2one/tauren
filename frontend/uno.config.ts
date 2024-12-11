@@ -1,8 +1,16 @@
-import {defineConfig, presetAttributify, presetUno, transformerVariantGroup} from 'unocss'
+import {defineConfig, presetAttributify, presetUno, transformerVariantGroup, presetIcons} from 'unocss'
+import fs from 'node:fs/promises'
 
 export default defineConfig({
     // ...UnoCSS options
-    presets: [presetUno({ dark: 'class' }), presetAttributify()],
+    presets: [presetUno({dark: 'class'}), presetAttributify(),
+        presetIcons({
+            collections: {
+                'my-icons': {
+                    question: () => fs.readFile('./src/assets/QuestionCircle.svg','utf-8')
+                }
+            }
+        })],
     shortcuts: {
         'wh-full': 'w-full h-full',
         'flex-center': 'flex justify-center items-center',

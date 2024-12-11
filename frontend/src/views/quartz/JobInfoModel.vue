@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type {FormInst, FormRules} from "naive-ui";
-import {NButton, NForm, NFormItemGi, NInput, NModal, NGrid, NRadioGroup, NRadioButton} from "naive-ui";
+import {NButton, NFlex, NForm, NFormItemGi, NGrid, NInput, NModal, NRadioButton, NRadioGroup, NTooltip} from "naive-ui";
 import {IJob} from "/@/api/types/common.ts";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {useForm} from "alova/client";
-import {createTask} from "/@/api/quartz";
+import {createTask, modifyTask} from "/@/api/quartz";
 
 const showModal = defineModel<boolean>('showModal', {default: false})
 const jobInfo = defineModel<IJob>('jobInfo', {
@@ -23,7 +23,9 @@ const rules: FormRules = {
 const handleCancel = () => {
   showModal.value = false
 }
-const {form, send: submit} = useForm(formData => createTask(formData), {
+const {form, send: submit} = useForm(formData => {
+  return formData.id ? modifyTask(formData) : createTask(formData)
+}, {
   initialForm: {
     jobName: '',
     jobGroup: '',
@@ -31,7 +33,8 @@ const {form, send: submit} = useForm(formData => createTask(formData), {
     invokeTarget: '',
     misfirePolicy: '3',
     concurrent: '0',
-    status: '1'
+    status: '1',
+    id: undefined
   },
   resetAfterSubmiting: true
 })
@@ -46,6 +49,9 @@ const handleSave = (e: MouseEvent) => {
     }
   })
 }
+watch(() => jobInfo.value, (newValue) => {
+  form.value = newValue
+})
 </script>
 
 <template>
@@ -78,6 +84,14 @@ const handleSave = (e: MouseEvent) => {
         <n-grid>
           <n-form-item-gi :span="24" label="调用方法" path="invokeTarget">
             <n-input v-model:value="form.invokeTarget" placeholder="请输入调用目标字符串"/>
+            <n-tooltip>
+              <template #trigger>
+                <n-button text class="i-my-icons:question"/>
+              </template>
+              <div>Bean调用示例：ryTask.ryParams('ry')</div>
+              <br>Class类调用示例：com.example.quartz.job.customTask.params('hello')
+              <br>参数说明：支持字符串，布尔类型，长整型，浮点型，整型
+            </n-tooltip>
           </n-form-item-gi>
         </n-grid>
         <n-grid>
@@ -100,14 +114,16 @@ const handleSave = (e: MouseEvent) => {
       </n-form>
     </div>
     <template #action>
-      <div>
-        <n-button @click="handleCancel">cancel</n-button>
-        <n-button @click="handleSave">ok</n-button>
-      </div>
+      <n-flex>
+        <n-button secondary size="small" @click="handleCancel">cancel</n-button>
+        <n-button type="primary" size="small" @click="handleSave">ok</n-button>
+      </n-flex>
     </template>
   </n-modal>
 </template>
 
 <style scoped>
-
+.text-wrapper {
+  white-space: pre-wrap;
+}
 </style>

@@ -19,6 +19,10 @@
           <entry name="F:/repository/com/mybatis-flex/mybatis-flex-annotation/1.10.2/mybatis-flex-annotation-1.10.2.jar" />
           <entry name="F:/repository/org/mybatis/mybatis/3.5.17/mybatis-3.5.17.jar" />
           <entry name="F:/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="F:/repository/com/mybatis-flex/mybatis-flex-processor/1.10.2/mybatis-flex-processor-1.10.2.jar" />
+          <entry name="F:/repository/com/mybatis-flex/mybatis-flex-annotation/1.10.2/mybatis-flex-annotation-1.10.2.jar" />
+          <entry name="F:/repository/org/mybatis/mybatis/3.5.17/mybatis-3.5.17.jar" />
+          <entry name="F:/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="backend" />
       </profile>

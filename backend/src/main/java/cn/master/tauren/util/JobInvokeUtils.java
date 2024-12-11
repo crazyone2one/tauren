@@ -20,7 +20,7 @@ public class JobInvokeUtils {
         List<Object[]> methodParams = getMethodParams(invokeTarget);
 
         if (!isValidClassName(beanName)) {
-            Object bean = SpringUtils.getBean(beanName);
+            Object bean = SpringContext.getBean(beanName);
             invokeMethod(bean, methodName, methodParams);
         } else {
             Object bean = Class.forName(beanName).getDeclaredConstructor().newInstance();

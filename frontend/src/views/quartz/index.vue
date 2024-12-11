@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import type {DataTableRowKey, DataTableColumns} from "naive-ui";
+import type {DataTableColumns, DataTableRowKey} from "naive-ui";
 import {NButton, NCard, NDataTable, NFlex, NSwitch} from "naive-ui";
 import {usePagination, useRequest} from "alova/client";
 import {fetchQuartzTaskPage, runTask} from "/@/api/quartz";
 import {IJob, ITableQueryParams} from "/@/api/types/common.ts";
-import {ref, h, onMounted, useTemplateRef} from "vue";
+import {h, onMounted, ref, useTemplateRef, watch} from "vue";
 import JobInfoModel from "/@/views/quartz/JobInfoModel.vue";
 
 const jobInfoModel = useTemplateRef<InstanceType<typeof JobInfoModel>>('jobInfoModel')
 const jobInfo = ref()
 const {
-  data,
-  page,
-  pageSize,
-  pageCount, send: loadJob
+  data, send: loadJob
 } = usePagination(
     // Method实例获取函数，它将接收page和pageSize，并返回一个Method实例
     (page, pageSize) => {
@@ -88,21 +85,29 @@ const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 const handleCheck = (rowKeys: DataTableRowKey[]) => {
   checkedRowKeysRef.value = rowKeys
 }
-const handleChangeJobStatus = (row?: IJob) => {
+const handleChangeJobStatus = (row: IJob) => {
   console.log(row)
   const text = row.status === '0' ? '启用' : '停用'
   window.$dialog.warning({
     content: '确认要"' + text + '""' + row.jobName + '"任务吗？'
   })
 }
-const {send: excuteRun} = useRequest((param) => runTask(param), {immediate: false})
+const {send: runTaskReq} = useRequest((param) => runTask(param), {immediate: false})
 const handleRunTask = (data: IJob) => {
-  excuteRun(data)
+  runTaskReq(data)
 }
 const handleEditJob = (param: IJob) => {
   showModal.value = true
   jobInfo.value = param
 }
+const handleCreateJob = () => {
+  showModal.value = true
+}
+watch(() => showModal.value, (newValue) => {
+  if (!newValue) {
+    loadJob()
+  }
+})
 onMounted(() => {
   loadJob()
 })
@@ -110,7 +115,7 @@ onMounted(() => {
 
 <template>
   <n-card>
-    <n-button size="tiny" type="info" @click="handleEditJob">创建任务</n-button>
+    <n-button size="tiny" type="info" @click="handleCreateJob">创建任务</n-button>
     <n-data-table
         :columns="columns"
         :data="data"
