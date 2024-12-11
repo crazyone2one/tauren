@@ -5,12 +5,11 @@ import cn.master.tauren.entity.EmployeeInfo;
 import cn.master.tauren.entity.SubstationInfo;
 import cn.master.tauren.service.PersonnelRealTimeBehavior;
 import cn.master.tauren.util.DateUtils;
+import cn.master.tauren.util.FileUtils;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -111,28 +110,8 @@ public class PersonnelRealTimeBehaviorImpl implements PersonnelRealTimeBehavior 
         }
 
         content.append(END_FLAG);
-        // 20241202160508
-        String filePath = "E:/ftp/" + "150622B0012000200092_RYSS_" + DateUtils.localDateTime2String(now) + ".txt";
-        FileWriter fw = null;
-        try {
-            File file = new File(filePath);
-            if (!file.exists()) {
-                boolean newFile = file.createNewFile();
-                if (newFile) {
-                    log.info("file created");
-                }
-            }
-            fw = new FileWriter(filePath);
-            fw.write(content.toString());
-        } catch (Exception e) {
-            log.error("", e);
-        } finally {
-            try {
-                assert fw != null;
-                fw.close();
-            } catch (Exception e) {
-                log.error("", e);
-            }
-        }
+        //String filePath = "E:/ftp/" + "150622B0012000200092_RYSS_" + DateUtils.localDateTime2String(now) + ".txt";
+        String filePath = "/app/files/rydw/" + "150622B0012000200092_RYSS_" + DateUtils.localDateTime2String(now) + ".txt";
+        FileUtils.genFile(filePath, content.toString(), "RYSS");
     }
 }

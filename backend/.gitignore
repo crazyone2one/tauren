@@ -30,3 +30,4 @@ target
 .classpath
 .factorypath
 src/main/resources/jmeter/lib/ext
+src/main/resources/static/

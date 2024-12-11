@@ -1,6 +1,7 @@
 package cn.master.tauren.job;
 
 import cn.master.tauren.service.PersonnelRealTimeBehavior;
+import cn.master.tauren.service.PrecipitationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,8 +15,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomTask {
     private final PersonnelRealTimeBehavior personnelRealTimeBehavior;
+    private final PrecipitationService precipitationService;
 
-    @Scheduled(cron = "0 0/1 * * * ?") // 每1分钟执行一次
+    //@Scheduled(cron = "0 0/1 * * * ?") // 每1分钟执行一次
     public void noParams() {
         log.info("执行无参方法");
     }
@@ -35,12 +37,19 @@ public class CustomTask {
     }
 
     /**
-     * 降水量数据,每10分钟生成一次文件
+     * 降水量基础数据,每天生成一次文件
+     */
+    @Scheduled(cron = "0 0 18 * * ?")
+    public void jslCddyFile() {
+        precipitationService.genPrecipitationCddyFile();
+    }
+
+    /**
+     * 降水量实时数据,每10分钟生成一次文件
      */
     @Scheduled(cron = "0 0/10 * * * ?")
     public void jslFile() {
-        // todo 降水量数据
-        log.info("生成降水量数据文件");
+        precipitationService.genPrecipitationCdssFile();
     }
 
     /**
