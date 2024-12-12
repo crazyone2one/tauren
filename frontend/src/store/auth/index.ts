@@ -16,7 +16,6 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async handleLoginInfo(data: any) {
-            console.log(data)
             setToken(data.access_token, data.refresh_token)
         }
     }

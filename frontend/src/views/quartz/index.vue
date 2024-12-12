@@ -2,7 +2,7 @@
 import type {DataTableColumns, DataTableRowKey} from "naive-ui";
 import {NButton, NCard, NDataTable, NFlex, NSwitch} from "naive-ui";
 import {usePagination, useRequest} from "alova/client";
-import {fetchQuartzTaskPage, runTask} from "/@/api/quartz";
+import {changeTaskStatus, fetchQuartzTaskPage, runTask} from "/@/api/quartz";
 import {IJob, ITableQueryParams} from "/@/api/types/common.ts";
 import {h, onMounted, ref, useTemplateRef, watch} from "vue";
 import JobInfoModel from "/@/views/quartz/JobInfoModel.vue";
@@ -86,10 +86,16 @@ const handleCheck = (rowKeys: DataTableRowKey[]) => {
   checkedRowKeysRef.value = rowKeys
 }
 const handleChangeJobStatus = (row: IJob) => {
-  console.log(row)
-  const text = row.status === '0' ? '启用' : '停用'
+  const text = row.status === '0' ? '停用' : '启用'
   window.$dialog.warning({
-    content: '确认要"' + text + '""' + row.jobName + '"任务吗？'
+    title: '警告',
+    content: '确认要"' + text + '""' + row.jobName + '"任务吗？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: async () => {
+      await changeTaskStatus(row.id as string, row.status === '0' ? '1' : '0');
+      await loadJob()
+    }
   })
 }
 const {send: runTaskReq} = useRequest((param) => runTask(param), {immediate: false})
