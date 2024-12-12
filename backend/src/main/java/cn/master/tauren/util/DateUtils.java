@@ -28,4 +28,15 @@ public class DateUtils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return localDateTime.format(formatter);
     }
+
+    /**
+     * 返回yyyy-MM-dd格式的时间
+     *
+     * @param localDateTime 需要转换的时间
+     * @return java.lang.String
+     */
+    public static String localDateTime2StringStyle3(LocalDateTime localDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return localDateTime.format(formatter);
+    }
 }

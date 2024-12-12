@@ -1,7 +1,6 @@
 package cn.master.tauren.job;
 
-import cn.master.tauren.service.PersonnelRealTimeBehavior;
-import cn.master.tauren.service.PrecipitationService;
+import cn.master.tauren.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +15,9 @@ import org.springframework.stereotype.Component;
 public class CustomTask {
     private final PersonnelRealTimeBehavior personnelRealTimeBehavior;
     private final PrecipitationService precipitationService;
+    private final SurfaceBaseInfoService surfaceBaseInfoService;
+    private final GushingInfoService gushingInfoService;
+    private final PumpInfoService pumpInfoService;
 
     //@Scheduled(cron = "0 0/1 * * * ?") // 每1分钟执行一次
     public void noParams() {
@@ -39,7 +41,7 @@ public class CustomTask {
     /**
      * 降水量基础数据,每天生成一次文件
      */
-    @Scheduled(cron = "0 0 18 * * ?")
+    @Scheduled(cron = "0 0 5 * * ?")
     public void jslCddyFile() {
         precipitationService.genPrecipitationCddyFile();
     }
@@ -48,7 +50,7 @@ public class CustomTask {
      * 降水量实时数据,每10分钟生成一次文件
      */
     @Scheduled(cron = "0 0/10 * * * ?")
-    public void jslFile() {
+    public void jslCdssFile() {
         precipitationService.genPrecipitationCdssFile();
     }
 
@@ -70,10 +72,54 @@ public class CustomTask {
         log.info("生成涌水量数据文件");
     }
 
-    public void dbsFile() {
-        // todo 地表水数据
-        log.info("生成地表水数据文件");
+    /**
+     * 地表水基础数据
+     */
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void surfaceCddyFile() {
+        surfaceBaseInfoService.generateSurfaceBaseInfo();
     }
+
+    /**
+     * 地表水实时数据
+     */
+    @Scheduled(cron = "0 0/10 * * * ?")
+    public void surfaceCdssFile() {
+        surfaceBaseInfoService.generateSurfaceCdss();
+    }
+
+    /**
+     * 涌水量基础数据
+     */
+    @Scheduled(cron = "0 0 14 * * ?")
+    public void gushingCddyFile() {
+        gushingInfoService.generateGushingInfo();
+    }
+
+    /**
+     * 涌水量实时数据
+     */
+    @Scheduled(cron = "0 0/10 * * * ?")
+    public void gushingCdssFile() {
+        gushingInfoService.generateGushingCdss();
+    }
+
+    /**
+     * 疏（放）水监测测点基础信息
+     */
+    @Scheduled(cron = "0 0 14 * * ?")
+    public void pumpCddyFile() {
+        pumpInfoService.generatePumpInfo();
+    }
+
+    /**
+     * 疏（放）水实时数据
+     */
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void pumpCdssFile() {
+        pumpInfoService.generatePumpCdss();
+    }
+
 
     public void withParams(String param) {
         log.info("执行方法[withParams],获取到的参数为{}", param);

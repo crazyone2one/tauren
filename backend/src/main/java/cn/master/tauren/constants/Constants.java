@@ -61,4 +61,6 @@ public class Constants {
      * 微震（水文）
      */
     public static final String SENSOR_TYPE_WZ = "0607";
+
+    public final static String END_FLAG = "||";
 }

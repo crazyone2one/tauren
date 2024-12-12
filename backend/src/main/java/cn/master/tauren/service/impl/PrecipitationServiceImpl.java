@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -67,9 +68,9 @@ public class PrecipitationServiceImpl extends ServiceImpl<PrecipitationMapper, P
 
     private StringBuilder cdssBodyContent(LocalDateTime now, Precipitation precipitation) {
         StringBuilder content = new StringBuilder();
-
         // 文件体
-        String localed = DateUtils.localDateTime2StringStyle2(now.minusMinutes(30));
+        Random random = new Random();
+        String localed = DateUtils.localDateTime2StringStyle2(now.minusMinutes(random.nextInt(10, 30)));
         content.append(precipitation.getId()).append(";").append(localed).append(";").append(localed).append(";").append(localed).append(";");
         // todo 测点值和测点状态对应关系
         content.append("0;");
