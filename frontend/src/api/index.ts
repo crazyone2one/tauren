@@ -21,7 +21,7 @@ const {onAuthRequired, onResponseRefreshToken} =
                     method.meta.isExpired = true;
                 }
                 console.log('token 过期了')
-                fetchUpdateToken(getToken().refreshToken).then(res=>{
+                fetchUpdateToken(getToken().refreshToken).then(res => {
                     console.log(res)
                 })
             },
