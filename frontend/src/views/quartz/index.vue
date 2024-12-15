@@ -2,7 +2,7 @@
 import type {DataTableColumns, DataTableRowKey} from "naive-ui";
 import {NButton, NCard, NDataTable, NFlex, NSwitch} from "naive-ui";
 import {usePagination, useRequest} from "alova/client";
-import {changeTaskStatus, fetchQuartzTaskPage, runTask} from "/@/api/quartz";
+import {changeTaskStatus, deleteTask, fetchQuartzTaskPage, pauseTask, resumeTask, runTask} from "/@/api/quartz";
 import {IJob, ITableQueryParams} from "/@/api/types/common.ts";
 import {h, onMounted, ref, useTemplateRef, watch} from "vue";
 import JobInfoModel from "/@/views/quartz/JobInfoModel.vue";
@@ -73,7 +73,10 @@ const columns: DataTableColumns<IJob> = [
       return h(NFlex, {}, {
         default: () => [
           h(NButton, {text: true, type: 'info', onClick: () => handleRunTask(row)}, {default: () => "run"}),
-          h(NButton, {text: true, type: 'warning', onClick: () => handleEditJob(row)}, {default: () => "edit"})
+          h(NButton, {text: true, type: 'warning', onClick: () => handleEditJob(row)}, {default: () => "edit"}),
+          h(NButton, {text: true, type: 'warning', onClick: () => handlePauseTask(row)}, {default: () => "pause"}),
+          h(NButton, {text: true, type: 'warning', onClick: () => handleResumeTask(row)}, {default: () => "resume"}),
+          h(NButton, {text: true, type: 'error', onClick: () => handleDeleteTask(row)}, {default: () => "delete"})
         ]
       })
     }
@@ -99,8 +102,21 @@ const handleChangeJobStatus = (row: IJob) => {
   })
 }
 const {send: runTaskReq} = useRequest((param) => runTask(param), {immediate: false})
+const {send: deleteTaskReq} = useRequest((param) => deleteTask(param), {immediate: false})
+const {send: pauseTaskReq} = useRequest((param) => pauseTask(param), {immediate: false})
+const {send: resumeTaskReq} = useRequest((param) => resumeTask(param), {immediate: false})
 const handleRunTask = (data: IJob) => {
   runTaskReq(data)
+}
+const handlePauseTask = async (data: IJob) => {
+  await pauseTaskReq(data)
+}
+const handleResumeTask = async (data: IJob) => {
+  await resumeTaskReq(data)
+}
+const handleDeleteTask = async (data: IJob) => {
+  await deleteTaskReq(data);
+  await loadJob()
 }
 const handleEditJob = (param: IJob) => {
   showModal.value = true

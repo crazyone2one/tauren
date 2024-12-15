@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @SpringBootTest
@@ -26,14 +28,10 @@ class TaurenApplicationTests {
     private EmployeeInfoMapper mapper;
     @Test
     void contextLoads() {
-        List<String> strings = new ArrayList<>();
-        strings.add("测试");
-        strings.add("厂家");
-        if (strings.contains("厂家1")) {
-            System.out.println(1);
-        } else {
-            System.out.println(2);
-        }
+        SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        java.util.Date date = new Date(1734073558);
+        String str = sdf.format(date);
+        System.out.println(str);
     }
 
 }

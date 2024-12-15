@@ -4,14 +4,13 @@ import cn.master.tauren.constants.Constants;
 import cn.master.tauren.entity.QuartzJob;
 import cn.master.tauren.payload.request.BasePageRequest;
 import cn.master.tauren.ret.ResultHolder;
-import cn.master.tauren.service.PersonnelRealTimeBehavior;
 import cn.master.tauren.service.QuartzJobService;
-import cn.master.tauren.util.CronUtils;
 import com.mybatisflex.core.paginate.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.quartz.CronExpression;
 import org.quartz.SchedulerException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +23,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "任务管理")
 public class QuartzController {
-    private final PersonnelRealTimeBehavior personnelRealTimeBehavior;
     private final QuartzJobService quartzJobService;
 
     @PostMapping("/create")
     @Operation(description = "创建定时任务")
     public ResultHolder createJob(@RequestBody QuartzJob job) {
-        if (!CronUtils.isValid(job.getCronExpression())) {
+        if (!CronExpression.isValidExpression(job.getCronExpression())) {
             return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，Cron表达式不正确", null);
         } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_RMI)) {
             return ResultHolder.error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi://'调用", null);
@@ -45,22 +43,21 @@ public class QuartzController {
         return ResultHolder.success(quartzJobService.insertJob(job), "任务创建成功");
     }
 
-    @GetMapping("/pause")
-    public String pauseJob() {
-        //ScheduleUtils.pauseJob(scheduler, jobName);
+    @PostMapping("/pause")
+    public String pauseJob(@RequestBody QuartzJob job) {
+        quartzJobService.pauseJob(job);
         return "pause success";
     }
 
-    @GetMapping("/resume")
-    public String resumeJob() {
-        //ScheduleUtils.resumeJob(scheduler, jobName);
+    @PostMapping("/resume")
+    public String resumeJob(@RequestBody QuartzJob job) {
+        quartzJobService.resumeJob(job);
         return "resume success";
     }
 
-    @GetMapping("/delete")
-    public String deleteJob() {
-        //ScheduleUtils.deleteJob(scheduler, jobName);
-        return "delete success";
+    @PostMapping("/deleteJob")
+    public boolean deleteJob(@RequestBody QuartzJob job) {
+        return quartzJobService.deleteJob(job);
     }
 
     @PutMapping("/once")
@@ -80,7 +77,7 @@ public class QuartzController {
     @PutMapping("/modify")
     @Operation(description = "修改定时任务")
     public ResultHolder modifyJob(@RequestBody QuartzJob job) throws SchedulerException {
-        if (!CronUtils.isValid(job.getCronExpression())) {
+        if (!CronExpression.isValidExpression(job.getCronExpression())) {
             return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，Cron表达式不正确", null);
         } else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_RMI)) {
             return ResultHolder.error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi://'调用", null);
@@ -100,10 +97,4 @@ public class QuartzController {
     public Page<QuartzJob> page(@Validated @RequestBody BasePageRequest request) {
         return quartzJobService.getAllJobs(request);
     }
-
-    @PostMapping("/gen")
-    public void gen() {
-        personnelRealTimeBehavior.genPersonnelFile();
-    }
-
 }

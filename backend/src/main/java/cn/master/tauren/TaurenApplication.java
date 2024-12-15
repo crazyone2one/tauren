@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * @author the2n
  */
-@EnableScheduling
 @SpringBootApplication
 @MapperScan("cn.master.tauren.mapper")
 public class TaurenApplication {

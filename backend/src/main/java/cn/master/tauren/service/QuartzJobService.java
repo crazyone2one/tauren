@@ -15,15 +15,17 @@ import org.quartz.SchedulerException;
 public interface QuartzJobService extends IService<QuartzJob> {
     int insertJob(QuartzJob job);
 
-    int updateJob(QuartzJob job) throws SchedulerException;
+    boolean updateJob(QuartzJob job) throws SchedulerException;
 
-    int changeStatus(QuartzJob job) throws SchedulerException;
+    boolean changeStatus(QuartzJob job);
 
-    int resumeJob(QuartzJob job) throws SchedulerException;
+    boolean resumeJob(QuartzJob job);
 
-    int pauseJob(QuartzJob job) throws SchedulerException;
+    boolean pauseJob(QuartzJob job);
 
     void run(QuartzJob job) throws SchedulerException;
+
+    boolean deleteJob(QuartzJob job);
 
     Page<QuartzJob> getAllJobs(BasePageRequest request);
 }

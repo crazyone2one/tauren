@@ -58,19 +58,20 @@ public class QuartzJob implements Serializable {
     @NotBlank
     @Schema(description = "任务名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "customTask.noParams()")
     private String invokeTarget;
-
+    private String jobClass;
+    private String interfaceName;
     /**
      * cron执行表达式
      */
     @NotBlank
-    @Schema(description = "cron执行表达式", requiredMode = Schema.RequiredMode.REQUIRED,example = "0 0/5 * * * ?")
+    @Schema(description = "cron执行表达式", requiredMode = Schema.RequiredMode.REQUIRED, example = "0 0/5 * * * ?")
     private String cronExpression;
 
     /**
      * 计划执行错误策略（1立即执行 2执行一次 3放弃执行
      */
     @NotBlank
-    @Schema(description = "计划执行错误策略", requiredMode = Schema.RequiredMode.REQUIRED,example = "3")
+    @Schema(description = "计划执行错误策略", requiredMode = Schema.RequiredMode.REQUIRED, example = "3")
     private String misfirePolicy;
 
     /**
@@ -82,6 +83,7 @@ public class QuartzJob implements Serializable {
      * 状态（0正常 1暂停）
      */
     private String status;
+
 
     /**
      * 创建者
@@ -111,5 +113,8 @@ public class QuartzJob implements Serializable {
     private String remark;
 
     private boolean deleted;
+    private Boolean cronJob;
 
+    @Column(ignore = true)
+    private Long repeatTime;
 }

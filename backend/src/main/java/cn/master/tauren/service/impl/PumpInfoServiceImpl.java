@@ -33,8 +33,8 @@ public class PumpInfoServiceImpl extends ServiceImpl<PumpInfoMapper, PumpInfo> i
     public void generatePumpInfo() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
         String fileName = "150622004499_SFSCDDY_" + DateUtils.localDateTime2String(now) + ".txt";
-        //String filePath = "/app/files/shfz/" + fileName;
-        String filePath = "E:/ftp/" + fileName;
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
         // 文件头
         StringBuilder content = new StringBuilder();
         content.append("150622004499;不连沟煤矿;").append(DateUtils.localDateTime2StringStyle2(now)).append("~");
@@ -72,8 +72,8 @@ public class PumpInfoServiceImpl extends ServiceImpl<PumpInfoMapper, PumpInfo> i
         LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
         String fileName = "150622004499_SFSCDSS_" + DateUtils.localDateTime2String(now) + ".txt";
         StringBuilder content = new StringBuilder();
-        //String filePath = "/app/files/shfz/" + fileName;
-        String filePath = "E:/ftp/" + fileName;
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
         // 文件头
         content.append("150622004499;不连沟煤矿;").append(DateUtils.localDateTime2StringStyle2(now)).append("~");
         // 文件体

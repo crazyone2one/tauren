@@ -1,6 +1,18 @@
 <script setup lang="ts">
 import type {FormInst, FormRules} from "naive-ui";
-import {NButton, NFlex, NForm, NFormItemGi, NGrid, NInput, NModal, NRadioButton, NRadioGroup, NTooltip} from "naive-ui";
+import {
+  NButton,
+  NFlex,
+  NForm,
+  NFormItemGi,
+  NGrid,
+  NInput,
+  NModal,
+  NRadioButton,
+  NRadioGroup,
+  NTooltip,
+  NSelect
+} from "naive-ui";
 import {IJob} from "/@/api/types/common.ts";
 import {computed, ref, watch} from "vue";
 import {useForm} from "alova/client";
@@ -20,6 +32,10 @@ const rules: FormRules = {
   invokeTarget: [{required: true, message: '调用目标字符串不能为空', trigger: 'blur'}],
   cronExpression: [{required: true, message: 'cron执行表达式不能为空', trigger: 'blur'}],
 }
+const jobGroupOptions = [
+  {label: '默认分组', value: 'DEFAULT'},
+  {label: '系统分组', value: 'SYSTEM'}
+];
 const handleCancel = () => {
   showModal.value = false
 }
@@ -28,13 +44,14 @@ const {form, send: submit} = useForm(formData => {
 }, {
   initialForm: {
     jobName: '',
-    jobGroup: '',
+    jobGroup: 'DEFAULT',
     cronExpression: '',
     invokeTarget: '',
     misfirePolicy: '3',
     concurrent: '0',
     status: '1',
-    id: undefined
+    id: undefined,
+    cronJob: true
   },
   resetAfterSubmiting: true
 })
@@ -73,7 +90,8 @@ watch(() => jobInfo.value, (newValue) => {
             <n-input v-model:value="form.jobName" placeholder="请输入任务名称"/>
           </n-form-item-gi>
           <n-form-item-gi :span="12" label="任务分组" path="jobGroup">
-            <n-input v-model:value="form.jobGroup" placeholder="请选择任务分组"/>
+            <!--            <n-input v-model:value="form.jobGroup" placeholder="请选择任务分组"/>-->
+            <n-select v-model:value="form.jobGroup" :options="jobGroupOptions"/>
           </n-form-item-gi>
         </n-grid>
         <n-grid>

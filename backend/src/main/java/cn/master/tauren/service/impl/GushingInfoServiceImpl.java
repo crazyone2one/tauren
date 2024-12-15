@@ -32,8 +32,8 @@ public class GushingInfoServiceImpl extends ServiceImpl<GushingInfoMapper, Gushi
     public void generateGushingInfo() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
         String fileName = "150622004499_YSLCDDY_" + DateUtils.localDateTime2String(now) + ".txt";
-        //String filePath = "/app/files/shfz/" + fileName;
-        String filePath = "E:/ftp/" + fileName;
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
         // 文件头
         String content = "150622004499;不连沟煤矿;" + DateUtils.localDateTime2StringStyle2(now) + "~" +
                 // 文件体
@@ -58,8 +58,8 @@ public class GushingInfoServiceImpl extends ServiceImpl<GushingInfoMapper, Gushi
         LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
         String fileName = "150622004499_YSLCDSS_" + DateUtils.localDateTime2String(now) + ".txt";
         StringBuilder content = new StringBuilder();
-        //String filePath = "/app/files/shfz/" + fileName;
-        String filePath = "E:/ftp/" + fileName;
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
         // 文件头
         content.append("150622004499;不连沟煤矿;").append(DateUtils.localDateTime2StringStyle2(now)).append("~");
         // 文件体
