@@ -45,7 +45,7 @@ public class RefreshTokenServiceImpl extends ServiceImpl<RefreshTokenMapper, Ref
         RefreshToken refreshToken = RefreshToken.builder()
                 .revoked(false)
                 .userId(user.getId())
-                .token(Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes()))
+                .token(jwtTokenProvider.generateRefreshToken(user.getUsername()))
                 .expiryDate(LocalDateTime.now().plusSeconds(refreshExpiration))
                 .deleted(false)
                 .build();
@@ -78,7 +78,7 @@ public class RefreshTokenServiceImpl extends ServiceImpl<RefreshTokenMapper, Ref
                 .map(RefreshToken::getUserId)
                 .orElseThrow(() -> new TokenException(ResultCode.TOKEN_ERROR_03, ResultCode.TOKEN_ERROR_03.getMessage(), null));
         CustomUser user = QueryChain.of(User.class).eq(User::getId, userId).oneAs(CustomUser.class);
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateAccessToken(user.getUsername());
         return RefreshTokenResponse.builder().accessToken(token)
                 .refreshToken(request.getRefreshToken())
                 .build();

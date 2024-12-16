@@ -32,7 +32,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .eq(User::getUsername, request.getUsername()).oneAsOpt(CustomUser.class)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateAccessToken(user.getUsername());
         return AuthenticationResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())

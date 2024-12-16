@@ -19,6 +19,9 @@ public class JwtTokenProvider {
 
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
+    @Value("${application.security.jwt.refresh-token.expiration}")
+    private long refreshExpiration;
+
     @Value("${application.security.jwt.secret-key}")
     private String secret;
     //SecretKey key = Jwts.SIG.HS256.key().build();
@@ -28,10 +31,18 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        String username = userDetails.getUsername();
-        Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + jwtExpiration);
+    public String generateAccessToken(String username) {
+        return generateToken(username, jwtExpiration);
+    }
+
+    public String generateRefreshToken(String username) {
+        return generateToken(username, refreshExpiration);
+    }
+
+    private String generateToken(String username, long expiration) {
+        //String username = userDetails.getUsername();
+        Date currentDate = new Date(System.currentTimeMillis());
+        Date expireDate = new Date(currentDate.getTime() + expiration);
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(currentDate)
@@ -49,7 +60,7 @@ public class JwtTokenProvider {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 

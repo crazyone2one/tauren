@@ -21,8 +21,8 @@ export const fetchLogin = (params: ILogin) => {
     return method
 }
 
-export const fetchUpdateToken = (params: any) => {
-    const method = request.Post("/api/v1/auth/refresh-token", params);
+export const fetchUpdateToken = (refreshToken: string) => {
+    const method = request.Post<ILoginRes>("/api/v1/auth/refresh-token", {refreshToken});
     method.meta = {
         authRole: 'refreshToken',
     };

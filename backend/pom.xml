@@ -35,6 +35,27 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <mybatis-flex.version>1.10.2</mybatis-flex.version>
     </properties>
+    <profiles>
+        <profile>
+            <!--不同环境的唯一id-->
+            <id>dev</id>
+            <activation>
+                <!--默认激活开发环境-->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!--profile.active对应application.yml中的@profile.active@-->
+                <profile.active>dev</profile.active>
+            </properties>
+        </profile>
+        <!--生产环境-->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profile.active>prod</profile.active>
+            </properties>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -215,6 +236,22 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>application-*.yml</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>application.yml</include>
+                    <include>application-${profile.active}*.yml</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
 </project>

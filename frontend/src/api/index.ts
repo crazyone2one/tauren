@@ -2,7 +2,7 @@ import {createAlova} from "alova";
 import {createServerTokenAuthentication} from "alova/client";
 import adapterFetch from "alova/fetch";
 import VueHook from "alova/vue";
-import {getToken} from "/@/utils/auth.ts";
+import {getToken, setToken} from "/@/utils/auth.ts";
 import {fetchUpdateToken} from "/@/api/login";
 
 
@@ -20,11 +20,17 @@ const {onAuthRequired, onResponseRefreshToken} =
                 } else {
                     method.meta.isExpired = true;
                 }
-                console.log('token 过期了')
+                // console.log('token 过期了')
                 fetchUpdateToken(getToken().refreshToken).then(res => {
                     console.log(res)
+                    setToken(res.access_token, res.refresh_token)
                 })
             },
+        },
+        assignToken: (method) => {
+            if (!method.meta?.ignoreToken) {
+                method.config.headers.Authorization = `Bearer ${getToken().accessToken}`;
+            }
         },
     });
 export const alovaInstance = createAlova({
