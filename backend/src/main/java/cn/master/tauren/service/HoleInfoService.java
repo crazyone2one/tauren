@@ -13,4 +13,9 @@ public interface HoleInfoService extends IService<HoleInfo> {
     void generateHoleInfo();
 
     void generateHoleRealData();
+
+    /**
+     * 长观孔测点异常数据
+     */
+    void generateHoleAlarmData();
 }

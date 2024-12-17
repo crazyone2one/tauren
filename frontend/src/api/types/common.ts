@@ -30,7 +30,8 @@ export interface IJob {
     jobName: string;
     jobGroup: string;
     cronExpression: string;
-    invokeTarget: string;
+    param: string;
+    jobClass: string;
     misfirePolicy: string;
     concurrent: string;
     status: string;

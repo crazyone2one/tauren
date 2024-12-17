@@ -70,6 +70,41 @@ public class DrainageInfoServiceImpl extends ServiceImpl<DrainageInfoMapper, Dra
         FileUtils.genFile(filePath, content.toString(), "排水量实时数据");
     }
 
+    @Override
+    public void drainageAlarm() {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
+        String fileName = "150622004499_PSLCDYC_" + DateUtils.localDateTime2String(now) + ".txt";
+        StringBuilder content = new StringBuilder();
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
+        // 文件头
+        content.append("150622004499;不连沟煤矿;").append(DateUtils.localDateTime2StringStyle2(now)).append("~");
+        // 文件体
+        List<DrainageInfo> gushingInfos = queryChain().list();
+        int randomLeaderIndex = ThreadLocalRandom.current().nextInt(gushingInfos.size());
+        DrainageInfo surfaceBaseInfo = gushingInfos.get(randomLeaderIndex);
+        content.append(alarmContent(now, surfaceBaseInfo));
+        content.append(END_FLAG);
+        FileUtils.genFile(filePath, content.toString(), "排水量异常实时数据");
+    }
+
+    private StringBuilder alarmContent(LocalDateTime now, DrainageInfo info) {
+        StringBuilder content = new StringBuilder();
+        // 文件体
+        content.append(info.getId()).append(";");
+        content.append(info.getInstallLocation()).append(";");
+        content.append("1").append(";");
+        content.append("日环比值4589>阙值（红）100.00;");
+        content.append(DateUtils.localDateTime2StringStyle2(now)).append(";");
+        content.append("3;");
+        content.append("系统恢复后，排水量预警值默认数值过小导致;");
+        content.append("张三;");
+        content.append(DateUtils.localDateTime2StringStyle2(now.plusMinutes(10)));
+        content.append(DateUtils.localDateTime2StringStyle2(now.plusMinutes(10)));
+        content.append("~");
+        return content;
+    }
+
     private StringBuilder cdssBodyContent(LocalDateTime now, DrainageInfo surfaceBaseInfo) {
         StringBuilder content = new StringBuilder();
         // 文件体

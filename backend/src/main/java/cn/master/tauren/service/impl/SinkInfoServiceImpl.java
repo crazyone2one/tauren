@@ -5,6 +5,7 @@ import cn.master.tauren.mapper.SinkInfoMapper;
 import cn.master.tauren.service.SinkInfoService;
 import cn.master.tauren.util.DateUtils;
 import cn.master.tauren.util.FileUtils;
+import cn.master.tauren.util.StringUtils;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,9 @@ public class SinkInfoServiceImpl extends ServiceImpl<SinkInfoMapper, SinkInfo> i
 
     private String realDataBodyContent(LocalDateTime now, SinkInfo info) {
         return info.getId() + ";" + info.getAreaName() + ";" + info.getPointId() + ";" + "0;" +
-                "4245615.60;" + "36372560.60;" + "1229.00;"
+                StringUtils.doubleTypeString(0, 4245615) + ";" +
+                StringUtils.doubleTypeString(0, 36372560) + ";" +
+                StringUtils.doubleTypeString(0, 1229) + ";"
                 + DateUtils.localDateTime2StringStyle2(now) + "~";
     }
 }

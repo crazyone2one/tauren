@@ -6,11 +6,12 @@ import {changeTaskStatus, deleteTask, fetchQuartzTaskPage, pauseTask, resumeTask
 import {IJob, ITableQueryParams} from "/@/api/types/common.ts";
 import {h, onMounted, ref, useTemplateRef, watch} from "vue";
 import JobInfoModel from "/@/views/quartz/JobInfoModel.vue";
+import TPagination from '/@/components/t-pagination/index.vue'
 
 const jobInfoModel = useTemplateRef<InstanceType<typeof JobInfoModel>>('jobInfoModel')
 const jobInfo = ref()
 const {
-  data, send: loadJob
+  data, send: loadJob, page, pageSize, total
 } = usePagination(
     // Method实例获取函数，它将接收page和pageSize，并返回一个Method实例
     (page, pageSize) => {
@@ -25,7 +26,7 @@ const {
         data: []
       },
       data: response => response.records,
-      total: response => response.total,
+      total: response => response.totalRow,
       initialPage: 1, // 初始页码，默认为1
       initialPageSize: 10 // 初始每页数据条数，默认为10
     }
@@ -44,7 +45,7 @@ const columns: DataTableColumns<IJob> = [
   },
   {
     title: '调用目标字符串',
-    key: 'invokeTarget'
+    key: 'jobClass'
   },
   {
     title: 'cron执行表达式',
@@ -82,7 +83,6 @@ const columns: DataTableColumns<IJob> = [
     }
   }
 ]
-const pagination = {pageSize: 5}
 const showModal = ref(false)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 const handleCheck = (rowKeys: DataTableRowKey[]) => {
@@ -125,6 +125,8 @@ const handleEditJob = (param: IJob) => {
 const handleCreateJob = () => {
   showModal.value = true
 }
+const handleSetPage = (param: number) => page.value = param
+const handleSetPageSize = (param: number) => pageSize.value = param
 watch(() => showModal.value, (newValue) => {
   if (!newValue) {
     loadJob()
@@ -137,14 +139,18 @@ onMounted(() => {
 
 <template>
   <n-card>
-    <n-button size="tiny" type="info" @click="handleCreateJob">创建任务</n-button>
+    <div class="mb-2">
+      <n-button size="tiny" type="info" @click="handleCreateJob">创建任务</n-button>
+    </div>
     <n-data-table
         :columns="columns"
         :data="data"
-        :pagination="pagination"
         :row-key="(row:IJob)=>row.id as string"
         @update:checked-row-keys="handleCheck"
     />
+    <t-pagination :page-size="pageSize" :page="page" :count="total"
+                  @update-page="handleSetPage"
+                  @update-page-size="handleSetPageSize"/>
   </n-card>
 
   <job-info-model ref="jobInfoModel" v-model:showModal="showModal" v-model:job-info="jobInfo"/>

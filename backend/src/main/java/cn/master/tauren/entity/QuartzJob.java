@@ -4,6 +4,7 @@ import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import com.mybatisflex.core.handler.JacksonTypeHandler;
 import com.mybatisflex.core.keygen.KeyGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -60,6 +61,9 @@ public class QuartzJob implements Serializable {
     private String invokeTarget;
     private String jobClass;
     private String interfaceName;
+
+    //@Column(typeHandler = JacksonTypeHandler.class)
+    private String param;
     /**
      * cron执行表达式
      */

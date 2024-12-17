@@ -5,6 +5,8 @@ import cn.master.tauren.entity.QuartzJob;
 import cn.master.tauren.mapper.QuartzJobMapper;
 import cn.master.tauren.payload.request.BasePageRequest;
 import cn.master.tauren.service.QuartzJobService;
+import cn.master.tauren.util.JsonUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,8 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 /**
  * 定时任务调度表 服务层实现。
@@ -34,9 +38,9 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertJob(QuartzJob job) {
-        job.setStatus(ScheduleConstants.Status.PAUSE.getValue());
+        //job.setStatus(ScheduleConstants.Status.PAUSE.getValue());
         job.setCronJob(true);
-        job.setJobClass(job.getInvokeTarget());
+        //job.setJobClass(job.getInvokeTarget());
         scheduleNewJob(job);
         log.info(">>>>> jobName = [{}] created.", job.getJobName());
         return 1;
@@ -45,20 +49,23 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
     @SuppressWarnings("unchecked")
     private void scheduleNewJob(QuartzJob quartzJob) {
         try {
-            //Scheduler scheduler = schedulerFactoryBean.getScheduler();
+            // 提取参数
+            //Map<String,String> jobDataMap = JsonUtils.parseObject(quartzJob.getParam(), new TypeReference<>() {
+            //});
             JobDetail jobDetail = JobBuilder
                     .newJob((Class<? extends QuartzJobBean>) Class.forName(quartzJob.getJobClass()))
                     .withIdentity(quartzJob.getJobName(), quartzJob.getJobGroup())
-                    .usingJobData("jobData", quartzJob.getJobName())
-                    .usingJobData("executeData", "test")
+                    //.usingJobData("jobData", quartzJob.getJobName())
+                    //.usingJobData("executeData", "test")
+                    //.usingJobData(jobDataMap)
                     .build();
             if (!scheduler.checkExists(jobDetail.getKey())) {
                 //jobDetail = scheduleCreator.createJob((Class<? extends QuartzJobBean>) Class.forName(quartzJob.getJobClass()), false, context, quartzJob.getJobName(), quartzJob.getJobGroup());
                 jobDetail = JobBuilder
                         .newJob((Class<? extends QuartzJobBean>) Class.forName(quartzJob.getJobClass()))
                         .withIdentity(quartzJob.getJobName(), quartzJob.getJobGroup())
-                        .usingJobData("jobData", quartzJob.getJobName())
-                        .usingJobData("executeData", "test")
+                        //.usingJobData("jobData", quartzJob.getJobName())
+                        //.usingJobData("executeData", "test")
                         .build();
                 //Trigger trigger = scheduleCreator.createCronTrigger(quartzJob.getJobName(), new Date(), quartzJob.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
                 Trigger trigger = TriggerBuilder.newTrigger()

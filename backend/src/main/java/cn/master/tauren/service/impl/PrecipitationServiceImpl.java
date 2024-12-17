@@ -1,6 +1,5 @@
 package cn.master.tauren.service.impl;
 
-import cn.master.tauren.entity.EmployeeInfo;
 import cn.master.tauren.entity.Precipitation;
 import cn.master.tauren.mapper.PrecipitationMapper;
 import cn.master.tauren.service.PrecipitationService;
@@ -55,25 +54,37 @@ public class PrecipitationServiceImpl extends ServiceImpl<PrecipitationMapper, P
         List<Precipitation> precipitationList = queryChain().list();
         int randomLeaderIndex = ThreadLocalRandom.current().nextInt(precipitationList.size());
         Precipitation leaderEmployeeInfo = precipitationList.get(randomLeaderIndex);
-        content.append(cdssBodyContent(now, leaderEmployeeInfo));
-        //String localed = DateUtils.localDateTime2StringStyle2(now.minusMinutes(30));
-        //content.append("150622004499cPVegADbaDtY;").append(localed).append(";").append(localed).append(";").append(localed).append(";");
-        //content.append("0;");
-        //// 测点值
-        //content.append(StringUtils.doubleTypeString(0, 20));
-        //content.append("~");
+        content.append(cdssBodyContent(now, leaderEmployeeInfo, "0"));
         content.append(END_FLAG);
-        FileUtils.genFile(filePath, content.toString(), "JSLCDSS");
+        FileUtils.genFile(filePath, content.toString(), fileName);
     }
 
-    private StringBuilder cdssBodyContent(LocalDateTime now, Precipitation precipitation) {
+    @Override
+    public void genPrecipitationAlarmFile(String alarmFlag) {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
+        String fileName = "150622004499_JSLCDSS_" + DateUtils.localDateTime2String(now) + ".txt";
+        StringBuilder content = new StringBuilder();
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
+        // 文件头
+        content.append("150622004499;不连沟煤矿;").append(DateUtils.localDateTime2StringStyle2(now)).append("~");
+        // 文件体
+        List<Precipitation> precipitationList = queryChain().list();
+        int randomLeaderIndex = ThreadLocalRandom.current().nextInt(precipitationList.size());
+        Precipitation leaderEmployeeInfo = precipitationList.get(randomLeaderIndex);
+        content.append(cdssBodyContent(now, leaderEmployeeInfo, alarmFlag));
+        content.append(END_FLAG);
+        FileUtils.genFile(filePath, content.toString(), fileName);
+    }
+
+    private StringBuilder cdssBodyContent(LocalDateTime now, Precipitation precipitation, String alarmFlag) {
         StringBuilder content = new StringBuilder();
         // 文件体
         Random random = new Random();
         String localed = DateUtils.localDateTime2StringStyle2(now.minusMinutes(random.nextInt(10, 30)));
         content.append(precipitation.getId()).append(";").append(localed).append(";").append(localed).append(";").append(localed).append(";");
         // todo 测点值和测点状态对应关系
-        content.append("0;");
+        content.append(org.apache.commons.lang3.StringUtils.equals("0", alarmFlag) ? "0;" : "32;");
         // 测点值
         content.append(StringUtils.doubleTypeString(0, 20));
         content.append("~");

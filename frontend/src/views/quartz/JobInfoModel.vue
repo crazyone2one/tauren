@@ -16,7 +16,7 @@ import {
 import {IJob} from "/@/api/types/common.ts";
 import {computed, ref, watch} from "vue";
 import {useForm} from "alova/client";
-import {createTask, modifyTask} from "/@/api/quartz";
+import {createTask, modifyTask} from "/@/api/quartz/index.ts";
 
 const showModal = defineModel<boolean>('showModal', {default: false})
 const jobInfo = defineModel<IJob>('jobInfo', {
@@ -29,7 +29,7 @@ const headerTitle = computed(() => {
 })
 const rules: FormRules = {
   jobName: [{required: true, message: '任务名称不能为空', trigger: 'blur'}],
-  invokeTarget: [{required: true, message: '调用目标字符串不能为空', trigger: 'blur'}],
+  jobClass: [{required: true, message: '调用目标字符串不能为空', trigger: 'blur'}],
   cronExpression: [{required: true, message: 'cron执行表达式不能为空', trigger: 'blur'}],
 }
 const jobGroupOptions = [
@@ -46,7 +46,8 @@ const {form, send: submit} = useForm(formData => {
     jobName: '',
     jobGroup: 'DEFAULT',
     cronExpression: '',
-    invokeTarget: '',
+    param: '',
+    jobClass: '',
     misfirePolicy: '3',
     concurrent: '0',
     status: '1',
@@ -94,30 +95,39 @@ watch(() => jobInfo.value, (newValue) => {
             <n-select v-model:value="form.jobGroup" :options="jobGroupOptions"/>
           </n-form-item-gi>
         </n-grid>
-        <n-grid>
-          <n-form-item-gi :span="24" label="cron表达式" path="cronExpression">
+        <n-grid :span="24">
+          <n-form-item-gi :span="12" label="cron表达式" path="cronExpression">
             <n-input v-model:value="form.cronExpression" placeholder="请输入cron执行表达式"/>
+          </n-form-item-gi>
+          <n-form-item-gi :span="12" label="任务参数" path="param">
+            <n-input v-model:value="form.param" placeholder="任务参数，{key：value}"/>
           </n-form-item-gi>
         </n-grid>
         <n-grid>
-          <n-form-item-gi :span="24" label="调用方法" path="invokeTarget">
-            <n-input v-model:value="form.invokeTarget" placeholder="请输入调用目标字符串"/>
+          <n-form-item-gi :span="24" label="调用方法" path="jobClass">
+            <n-input v-model:value="form.jobClass" placeholder="请输入调用目标字符串"/>
             <n-tooltip>
               <template #trigger>
                 <n-button text class="i-my-icons:question"/>
               </template>
-              <div>Bean调用示例：ryTask.ryParams('ry')</div>
-              <br>Class类调用示例：com.example.quartz.job.customTask.params('hello')
-              <br>参数说明：支持字符串，布尔类型，长整型，浮点型，整型
+              <!--              <div>Bean调用示例：ryTask.ryParams('ry')</div>-->
+              <br>Class类调用示例：com.example.quartz.job.CustomTask
+              <!--              <br>参数说明：支持字符串，布尔类型，长整型，浮点型，整型-->
             </n-tooltip>
           </n-form-item-gi>
         </n-grid>
-        <n-grid>
-          <n-form-item-gi :span="24" label="执行策略" path="inputValue">
+        <n-grid :cols="24" :x-gap="24">
+          <n-form-item-gi :span="12" label="执行策略" path="inputValue">
             <n-radio-group v-model:value="form.misfirePolicy" name="misfirePolicy">
               <n-radio-button value="1">立即执行</n-radio-button>
               <n-radio-button value="2">执行一次</n-radio-button>
               <n-radio-button value="3">放弃执行</n-radio-button>
+            </n-radio-group>
+          </n-form-item-gi>
+          <n-form-item-gi :span="12" label="任务状态" path="status">
+            <n-radio-group v-model:value="form.status" name="status">
+              <n-radio-button value="1">暂停</n-radio-button>
+              <n-radio-button value="0">正常</n-radio-button>
             </n-radio-group>
           </n-form-item-gi>
         </n-grid>

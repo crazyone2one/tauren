@@ -16,7 +16,12 @@ public interface PrecipitationService extends IService<Precipitation> {
     void genPrecipitationCddyFile();
 
     /**
-     * 降水量实时数据
+     * 正常降水量实时数据
      */
     void genPrecipitationCdssFile();
+
+    /**
+     * 降水量报警实时数据
+     */
+    void genPrecipitationAlarmFile(String alarmFlag);
 }
