@@ -15,81 +15,81 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 地表岩移基础数据 实体类。
+ * 钻孔应力测点基本信息 实体类。
  *
  * @author 11's papa
- * @since 1.0.0 2024-12-16
+ * @since 1.0.0 2024-12-17
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("tb_sink_info")
-public class SinkInfo implements Serializable {
+@Table("tb_stress_sensor")
+public class StressSensor implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * 业务编码
      */
     @Id(keyType = KeyType.Generator,value = KeyGenerators.flexId)
     private String id;
 
     /**
-     * 区域名称
+     * 测点编码
      */
-    private String areaName;
+    private String sensorId;
 
     /**
-     * 开采深度
+     * 监测区名称
      */
-    private String miningDepth;
+    private String sensorAreaName;
 
     /**
-     * 区域面积
+     * 传感器类型
      */
-    private String areaExtent;
+    private String pointType;
 
     /**
-     * 采区边界
+     * 传感器位置
      */
-    private String areaBoundary;
+    private String pointName;
 
     /**
-     * 开采方式
+     * 应力计安装深度
      */
-    private String exploitationMethod;
+    private String installDepth;
 
     /**
-     * 桩点编号
+     * 安装时间
      */
-    private String pointId;
+    private LocalDateTime installTime;
 
     /**
-     * 坐标x
+     * 应力计坐标X
      */
     private String x;
 
     /**
-     * 坐标y
+     * 应力计坐标Y
      */
     private String y;
 
     /**
-     * 坐标z
+     * 应力计坐标Z
      */
     private String z;
 
     /**
-     * 数据定义时间
+     * 应力计方向
      */
-    private LocalDateTime dataTime;
+    private String direction;
 
     /**
-     * 测点编码
+     * 初始应力
      */
-    private String sensorId;
+    private String startValue;
 
     /**
      * 删除标识
