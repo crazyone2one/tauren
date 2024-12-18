@@ -24,4 +24,9 @@ public interface DrainageInfoService extends IService<DrainageInfo> {
      * 排水量异常数据
      */
     void drainageAlarm();
+
+    /**
+     * 水泵开停实时数据
+     */
+    void drainageStartStop();
 }

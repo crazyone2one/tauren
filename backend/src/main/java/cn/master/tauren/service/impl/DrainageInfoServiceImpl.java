@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static cn.master.tauren.constants.Constants.END_FLAG;
@@ -86,6 +87,38 @@ public class DrainageInfoServiceImpl extends ServiceImpl<DrainageInfoMapper, Dra
         content.append(alarmContent(now, surfaceBaseInfo));
         content.append(END_FLAG);
         FileUtils.genFile(filePath, content.toString(), "排水量异常实时数据");
+    }
+
+    @Override
+    public void drainageStartStop() {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
+        String fileName = "150622004499_SBCDSS_" + DateUtils.localDateTime2String(now) + ".txt";
+        StringBuilder content = new StringBuilder();
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
+        // 文件头
+        content.append("150622004499;不连沟煤矿;").append(DateUtils.localDateTime2StringStyle2(now)).append("~");
+        // 文件体
+        List<DrainageInfo> gushingInfos = queryChain().list();
+        int randomLeaderIndex = ThreadLocalRandom.current().nextInt(gushingInfos.size());
+        DrainageInfo surfaceBaseInfo = gushingInfos.get(randomLeaderIndex);
+        content.append(sbBodyContent(now, surfaceBaseInfo));
+        content.append(END_FLAG);
+        FileUtils.genFile(filePath, content.toString(), "排水泵开停实时数据");
+    }
+
+    private String sbBodyContent(LocalDateTime now, DrainageInfo info) {
+        Random random = new Random();
+        int nextInt = random.nextInt(5);
+        String flag = "1";
+        if (nextInt == 2) {
+            flag = "0";
+        }
+        return info.getSensorId() + ";" + info.getPumpName() + ";"
+                + DateUtils.localDateTime2StringStyle2(now.minusDays(1)) + ";"
+                + DateUtils.localDateTime2StringStyle2(now) + ";"
+                + flag + ";"
+                + DateUtils.localDateTime2StringStyle2(now) + "~";
     }
 
     private StringBuilder alarmContent(LocalDateTime now, DrainageInfo info) {
