@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 定时任务调度表 实体类。
@@ -62,8 +63,8 @@ public class QuartzJob implements Serializable {
     private String jobClass;
     private String interfaceName;
 
-    //@Column(typeHandler = JacksonTypeHandler.class)
-    private String param;
+    @Column(typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> param;
     /**
      * cron执行表达式
      */

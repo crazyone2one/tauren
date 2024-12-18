@@ -60,10 +60,13 @@ const handleSave = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value?.validate(e => {
     if (!e) {
+      if (form.value.param) {
+        form.value.param=JSON.parse(form.value.param)
+      }
       submit().then(() => {
         showModal.value = false
         formRef.value?.restoreValidation()
-      })
+      });
     }
   })
 }

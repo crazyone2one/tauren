@@ -25,12 +25,16 @@ export interface ITableQueryParams {
     [key: string]: any;
 }
 
+export interface IParam {
+    [key: string]: string
+}
+
 export interface IJob {
     id?: string;
     jobName: string;
     jobGroup: string;
     cronExpression: string;
-    param: string;
+    param: IParam | string;
     jobClass: string;
     misfirePolicy: string;
     concurrent: string;

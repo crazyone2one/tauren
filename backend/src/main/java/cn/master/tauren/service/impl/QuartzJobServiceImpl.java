@@ -50,8 +50,7 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
     private void scheduleNewJob(QuartzJob quartzJob) {
         try {
             // 提取参数
-            //Map<String,String> jobDataMap = JsonUtils.parseObject(quartzJob.getParam(), new TypeReference<>() {
-            //});
+            Map<String,String> jobDataMap = quartzJob.getParam();
             JobDetail jobDetail = JobBuilder
                     .newJob((Class<? extends QuartzJobBean>) Class.forName(quartzJob.getJobClass()))
                     .withIdentity(quartzJob.getJobName(), quartzJob.getJobGroup())
@@ -59,6 +58,7 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
                     //.usingJobData("executeData", "test")
                     //.usingJobData(jobDataMap)
                     .build();
+            jobDetail.getJobDataMap().putAll(jobDataMap);
             if (!scheduler.checkExists(jobDetail.getKey())) {
                 //jobDetail = scheduleCreator.createJob((Class<? extends QuartzJobBean>) Class.forName(quartzJob.getJobClass()), false, context, quartzJob.getJobName(), quartzJob.getJobGroup());
                 jobDetail = JobBuilder
@@ -67,6 +67,7 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
                         //.usingJobData("jobData", quartzJob.getJobName())
                         //.usingJobData("executeData", "test")
                         .build();
+                jobDetail.getJobDataMap().putAll(jobDataMap);
                 //Trigger trigger = scheduleCreator.createCronTrigger(quartzJob.getJobName(), new Date(), quartzJob.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
                 Trigger trigger = TriggerBuilder.newTrigger()
                         .withIdentity(quartzJob.getJobName(), quartzJob.getJobGroup())

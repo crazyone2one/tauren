@@ -2,6 +2,7 @@ package cn.master.tauren.job;
 
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
@@ -17,6 +18,7 @@ public class SampleJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
+        JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
         String now = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
         log.info("当前任务[{}]执行的时间: {}", context.getScheduler(), context.getFireTime());
     }

@@ -75,8 +75,18 @@ const columns: DataTableColumns<IJob> = [
         default: () => [
           h(NButton, {text: true, type: 'info', onClick: () => handleRunTask(row)}, {default: () => "run"}),
           h(NButton, {text: true, type: 'warning', onClick: () => handleEditJob(row)}, {default: () => "edit"}),
-          h(NButton, {text: true, type: 'warning', onClick: () => handlePauseTask(row)}, {default: () => "pause"}),
-          h(NButton, {text: true, type: 'warning', onClick: () => handleResumeTask(row)}, {default: () => "resume"}),
+          h(NButton, {
+            text: true,
+            type: 'warning',
+            disabled: row.status === '1',
+            onClick: () => handlePauseTask(row)
+          }, {default: () => "pause"}),
+          h(NButton, {
+            text: true,
+            type: 'success',
+            disabled: row.status === '0',
+            onClick: () => handleResumeTask(row)
+          }, {default: () => "resume"}),
           h(NButton, {text: true, type: 'error', onClick: () => handleDeleteTask(row)}, {default: () => "delete"})
         ]
       })
@@ -108,19 +118,59 @@ const {send: resumeTaskReq} = useRequest((param) => resumeTask(param), {immediat
 const handleRunTask = (data: IJob) => {
   runTaskReq(data)
 }
+/**
+ * 暂停任务
+ * @param data
+ */
 const handlePauseTask = async (data: IJob) => {
-  await pauseTaskReq(data)
+  window.$dialog.warning({
+    title: 'tips',
+    content: `确定暂停【${data.jobName}】任务？`,
+    positiveText: '确定',
+    negativeText: '不确定',
+    maskClosable: false,
+    onPositiveClick: async () => {
+      await pauseTaskReq(data)
+    }
+  })
 }
+/**
+ * 恢复任务
+ * @param data
+ */
 const handleResumeTask = async (data: IJob) => {
-  await resumeTaskReq(data)
+  window.$dialog.warning({
+    title: 'tips',
+    content: `确定恢复【${data.jobName}】任务？`,
+    positiveText: '确定',
+    negativeText: '不确定',
+    maskClosable: false,
+    onPositiveClick: async () => {
+      await resumeTaskReq(data)
+    }
+  })
 }
-const handleDeleteTask = async (data: IJob) => {
-  await deleteTaskReq(data);
-  await loadJob()
+const handleDeleteTask = (data: IJob) => {
+  window.$dialog.error({
+    title: 'tips',
+    content: `确定删除【${data.jobName}】任务？`,
+    positiveText: '确定',
+    negativeText: '不确定',
+    maskClosable: false,
+    onPositiveClick: async () => {
+      await deleteTaskReq(data);
+      await loadJob()
+    }
+  })
 }
-const handleEditJob = (param: IJob) => {
+/**
+ * 编辑功能
+ * @param data
+ */
+const handleEditJob = (data: IJob) => {
   showModal.value = true
-  jobInfo.value = param
+  jobInfo.value = data
+  jobInfo.value.param = JSON.stringify(jobInfo.value.param)
 }
 const handleCreateJob = () => {
   showModal.value = true
