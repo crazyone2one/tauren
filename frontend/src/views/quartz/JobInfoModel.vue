@@ -61,11 +61,13 @@ const handleSave = (e: MouseEvent) => {
   formRef.value?.validate(e => {
     if (!e) {
       if (form.value.param) {
-        form.value.param=JSON.parse(form.value.param)
+        form.value.param = JSON.parse(form.value.param)
       }
+      const msg = form.value.id ? "更新成功" : "新增成功"
       submit().then(() => {
         showModal.value = false
         formRef.value?.restoreValidation()
+        window.$message.success(msg)
       });
     }
   })

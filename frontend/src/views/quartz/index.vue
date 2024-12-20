@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import type {DataTableColumns, DataTableRowKey} from "naive-ui";
-import {NButton, NCard, NDataTable, NFlex, NSwitch} from "naive-ui";
+import {NButton, NCard, NDataTable, NFlex, NSwitch, NInput} from "naive-ui";
 import {usePagination, useRequest} from "alova/client";
 import {changeTaskStatus, deleteTask, fetchQuartzTaskPage, pauseTask, resumeTask, runTask} from "/@/api/quartz";
-import {IJob, ITableQueryParams} from "/@/api/types/common.ts";
+import {IJob} from "/@/api/types/common.ts";
 import {h, onMounted, ref, useTemplateRef, watch} from "vue";
 import JobInfoModel from "/@/views/quartz/JobInfoModel.vue";
 import TPagination from '/@/components/t-pagination/index.vue'
 
 const jobInfoModel = useTemplateRef<InstanceType<typeof JobInfoModel>>('jobInfoModel')
 const jobInfo = ref()
+const keyword = ref<string>('')
 const {
   data, send: loadJob, page, pageSize, total
 } = usePagination(
     // Method实例获取函数，它将接收page和pageSize，并返回一个Method实例
-    (page, pageSize) => {
-      const param: ITableQueryParams = {page, pageSize};
-      return fetchQuartzTaskPage(param)
-    },
+    (page, pageSize) => fetchQuartzTaskPage(page, pageSize, keyword.value),
     {
       immediate: false,
       // 请求前的初始数据（接口返回的数据格式）
@@ -170,7 +168,7 @@ const handleDeleteTask = (data: IJob) => {
 const handleEditJob = (data: IJob) => {
   showModal.value = true
   jobInfo.value = data
-  jobInfo.value.param = JSON.stringify(jobInfo.value.param)
+  jobInfo.value.param = jobInfo.value.param === null ? "" : JSON.stringify(jobInfo.value.param)
 }
 const handleCreateJob = () => {
   showModal.value = true
@@ -182,6 +180,11 @@ watch(() => showModal.value, (newValue) => {
     loadJob()
   }
 })
+// watch(() => keyword.value, (newValue) => {
+//   if (!newValue) {
+//     loadJob()
+//   }
+// })
 onMounted(() => {
   loadJob()
 })
@@ -189,8 +192,16 @@ onMounted(() => {
 
 <template>
   <n-card>
-    <div class="mb-2">
-      <n-button size="tiny" type="info" @click="handleCreateJob">创建任务</n-button>
+    <div class="flex flex-row items-center justify-between mb-2">
+      <div class="flex items-stretch">
+        <n-button size="small" type="info" @click="handleCreateJob">创建任务</n-button>
+        <n-button size="small" type="warning" disabled>批量暂停</n-button>
+        <n-button size="small" type="success" disabled>批量恢复</n-button>
+        <n-button size="small" type="error" disabled>批量删除</n-button>
+      </div>
+      <div class="flex flex-row gap-[8px]">
+        <n-input v-model:value="keyword" placeholder="输入查询条件" clearable @keydown.enter="loadJob"/>
+      </div>
     </div>
     <n-data-table
         :columns="columns"

@@ -1,7 +1,8 @@
 import {alovaInstance as request} from "/@/api/index.ts";
 import {ICommonPage, IJob, ITableQueryParams} from "/@/api/types/common.ts";
 
-export const fetchQuartzTaskPage = (params: ITableQueryParams) => {
+export const fetchQuartzTaskPage = (page: number, pageSize: number, keyword: string) => {
+    const params: ITableQueryParams = {page: page, pageSize: pageSize, keyword: keyword};
     return request.Post<ICommonPage<IJob>>("/quartz/page", params);
 }
 /**

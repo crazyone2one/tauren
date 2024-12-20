@@ -2,23 +2,21 @@ package cn.master.tauren.service.impl;
 
 import cn.master.tauren.constants.ScheduleConstants;
 import cn.master.tauren.entity.QuartzJob;
+import cn.master.tauren.exception.TaskException;
 import cn.master.tauren.mapper.QuartzJobMapper;
 import cn.master.tauren.payload.request.BasePageRequest;
 import cn.master.tauren.service.QuartzJobService;
-import cn.master.tauren.util.JsonUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 定时任务调度表 服务层实现。
@@ -31,9 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob> implements QuartzJobService {
     private final QuartzJobMapper quartzJobMapper;
-    private final SchedulerFactoryBean schedulerFactoryBean;
     private final Scheduler scheduler;
-    private final ApplicationContext context;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -50,29 +46,30 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
     private void scheduleNewJob(QuartzJob quartzJob) {
         try {
             // 提取参数
-            Map<String,String> jobDataMap = quartzJob.getParam();
+
             JobDetail jobDetail = JobBuilder
                     .newJob((Class<? extends QuartzJobBean>) Class.forName(quartzJob.getJobClass()))
                     .withIdentity(quartzJob.getJobName(), quartzJob.getJobGroup())
-                    //.usingJobData("jobData", quartzJob.getJobName())
-                    //.usingJobData("executeData", "test")
-                    //.usingJobData(jobDataMap)
                     .build();
-            jobDetail.getJobDataMap().putAll(jobDataMap);
+            Map<String, String> jobDataMap = quartzJob.getParam();
+            boolean flag = Objects.nonNull(jobDataMap) && !jobDataMap.isEmpty();
+            if (flag) {
+                jobDetail.getJobDataMap().putAll(jobDataMap);
+            }
             if (!scheduler.checkExists(jobDetail.getKey())) {
                 //jobDetail = scheduleCreator.createJob((Class<? extends QuartzJobBean>) Class.forName(quartzJob.getJobClass()), false, context, quartzJob.getJobName(), quartzJob.getJobGroup());
                 jobDetail = JobBuilder
                         .newJob((Class<? extends QuartzJobBean>) Class.forName(quartzJob.getJobClass()))
                         .withIdentity(quartzJob.getJobName(), quartzJob.getJobGroup())
-                        //.usingJobData("jobData", quartzJob.getJobName())
-                        //.usingJobData("executeData", "test")
                         .build();
-                jobDetail.getJobDataMap().putAll(jobDataMap);
-                //Trigger trigger = scheduleCreator.createCronTrigger(quartzJob.getJobName(), new Date(), quartzJob.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+                if (flag) {
+                    jobDetail.getJobDataMap().putAll(jobDataMap);
+                }
+                CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(quartzJob.getCronExpression());
                 Trigger trigger = TriggerBuilder.newTrigger()
                         .withIdentity(quartzJob.getJobName(), quartzJob.getJobGroup())
                         .forJob(jobDetail)
-                        .withSchedule(CronScheduleBuilder.cronSchedule(quartzJob.getCronExpression()))
+                        .withSchedule(handleCronScheduleMisfirePolicy(quartzJob, cronScheduleBuilder))
                         .build();
                 //if (quartzJob.getCronJob()) {
                 //    trigger = scheduleCreator.createCronTrigger(quartzJob.getJobName(), new Date(), quartzJob.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
@@ -85,11 +82,9 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
                 //    scheduler.scheduleJob(jobDetail, trigger);
                 //}
                 scheduler.scheduleJob(jobDetail, trigger);
-                quartzJob.setStatus(ScheduleConstants.Status.NORMAL.getValue());
-                quartzJob.setRemark("i am job number " + quartzJob.getJobName());
                 quartzJob.setInterfaceName("interface_" + quartzJob.getJobName());
                 mapper.insert(quartzJob);
-                log.info(">>>>> jobName = [{}] scheduled.", quartzJob.getJobName());
+                //log.info(">>>>> jobName = [{}] scheduled.", quartzJob.getJobName());
             } else {
                 log.error("scheduleNewJobRequest.jobAlreadyExist");
             }
@@ -97,6 +92,24 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
             log.error("Class Not Found - {}", quartzJob.getJobClass(), e);
         } catch (SchedulerException e) {
             log.error(e.getMessage(), e);
+        } catch (TaskException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private CronScheduleBuilder handleCronScheduleMisfirePolicy(QuartzJob quartzJob, CronScheduleBuilder cronScheduleBuilder) throws TaskException {
+        switch (quartzJob.getMisfirePolicy()) {
+            case ScheduleConstants.MISFIRE_IGNORE_MISFIRES -> {
+                return cronScheduleBuilder;
+            }
+            case ScheduleConstants.MISFIRE_FIRE_AND_PROCEED -> {
+                return cronScheduleBuilder.withMisfireHandlingInstructionFireAndProceed();
+            }
+            case ScheduleConstants.MISFIRE_DO_NOTHING -> {
+                return cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
+            }
+            default -> throw new TaskException("The task misfire policy '" + quartzJob.getMisfirePolicy()
+                    + "' cannot be used in cron schedule tasks", TaskException.Code.CONFIG_ERROR);
         }
     }
 
@@ -191,6 +204,8 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
 
     @Override
     public Page<QuartzJob> getAllJobs(BasePageRequest request) {
-        return queryChain().page(Page.of(request.getPage(), request.getPageSize()));
+        return queryChain().where(QuartzJob::getJobName).like(request.getKeyword())
+                .orderBy(QuartzJob::getCreateTime).desc()
+                .page(Page.of(request.getPage(), request.getPageSize()));
     }
 }

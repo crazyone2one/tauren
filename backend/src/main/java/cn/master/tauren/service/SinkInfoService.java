@@ -11,8 +11,9 @@ import cn.master.tauren.entity.SinkInfo;
  */
 public interface SinkInfoService extends IService<SinkInfo> {
     /**
-     *
-     * 正常 地表岩移基础数据
+     * 正常 地表岩移实时数据
      */
     void generateSinkRealData();
+
+    void generateSinkBaseInfo();
 }

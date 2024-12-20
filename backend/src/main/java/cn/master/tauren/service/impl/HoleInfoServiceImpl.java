@@ -1,6 +1,7 @@
 package cn.master.tauren.service.impl;
 
 import cn.master.tauren.entity.HoleInfo;
+import cn.master.tauren.entity.SinkInfo;
 import cn.master.tauren.mapper.HoleInfoMapper;
 import cn.master.tauren.service.HoleInfoService;
 import cn.master.tauren.util.DateUtils;
@@ -28,7 +29,28 @@ public class HoleInfoServiceImpl extends ServiceImpl<HoleInfoMapper, HoleInfo> i
 
     @Override
     public void generateHoleInfo() {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
+        String fileName = "150622004499_CGKCDDY_" + DateUtils.localDateTime2String(now) + ".txt";
+        StringBuilder content = new StringBuilder();
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
+        // 文件头
+        content.append("150622004499;不连沟煤矿;").append(DateUtils.localDateTime2StringStyle2(now)).append("~");
+        // 文件体
+        content.append(baseBodyContent(now));
+        content.append(END_FLAG);
+        FileUtils.genFile(filePath, content.toString(), "长观孔基础数据");
+    }
 
+    private String baseBodyContent(LocalDateTime now) {
+        String randomAlphabetic = RandomStringUtils.randomAlphabetic(9);
+        return "150622004499MN" + randomAlphabetic + ";0502;" +
+                "水文孔"+randomAlphabetic + ";" +
+                randomAlphabetic + "上段;" +
+                StringUtils.doubleTypeString(50, 100) + ";" + StringUtils.doubleTypeString(50, 100) + ";" +
+                StringUtils.doubleTypeString(50, 100) + ";" + StringUtils.doubleTypeString(50, 100) + ";" +
+                "4245615.60;36372560.60;1229.00;" +
+                DateUtils.localDateTime2StringStyle3(now) + "~";
     }
 
     @Override

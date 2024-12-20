@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final AuthenticationManager authenticationManager;
 
 
@@ -42,8 +41,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated());
         //http.authenticationProvider(authenticationProvider);
         http.exceptionHandling(exception -> exception
-                .accessDeniedHandler(customAccessDeniedHandler)
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint));
+                //.accessDeniedHandler(customAccessDeniedHandler)
+                .authenticationEntryPoint(restAuthenticationEntryPoint));
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authenticationManager(authenticationManager)

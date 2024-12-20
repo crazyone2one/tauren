@@ -7,6 +7,7 @@ import cn.master.tauren.util.DateUtils;
 import cn.master.tauren.util.FileUtils;
 import cn.master.tauren.util.StringUtils;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,6 +42,36 @@ public class SinkInfoServiceImpl extends ServiceImpl<SinkInfoMapper, SinkInfo> i
         content.append(realDataBodyContent(now, surfaceBaseInfo));
         content.append(END_FLAG);
         FileUtils.genFile(filePath, content.toString(), "地表岩移实时数据");
+    }
+
+    @Override
+    public void generateSinkBaseInfo() {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.of("+8"));
+        String fileName = "150622004499_DBCXCDDY_" + DateUtils.localDateTime2String(now) + ".txt";
+        StringBuilder content = new StringBuilder();
+        String filePath = "/app/files/shfz/" + fileName;
+        //String filePath = "E:/ftp/" + fileName;
+        // 文件头
+        content.append("150622004499;不连沟煤矿;").append(DateUtils.localDateTime2StringStyle2(now)).append("~");
+        // 文件体
+        //List<SinkInfo> lists = queryChain().list();
+        //int randomLeaderIndex = ThreadLocalRandom.current().nextInt(lists.size());
+        //SinkInfo surfaceBaseInfo = lists.get(randomLeaderIndex);
+        content.append(baseBodyContent(now, null));
+        content.append(END_FLAG);
+        FileUtils.genFile(filePath, content.toString(), "地表岩移基础数据");
+    }
+
+    private String baseBodyContent(LocalDateTime now, SinkInfo surfaceBaseInfo) {
+        String randomAlphabetic = RandomStringUtils.randomAlphabetic(9);
+        return "150622004499MN" + randomAlphabetic + ";" +
+                randomAlphabetic + "地表沦陷区;" +
+                StringUtils.doubleTypeString(50, 100) + ";" + StringUtils.doubleTypeString(50, 100) + ";" +
+                "4245615.60,4245615.60&" + "36372560.60,36372560.60&" + "1229.00,1229.00;" +
+                "综采" + randomAlphabetic + ";" +
+                randomAlphabetic + "#桩点;" +
+                "4245615.60;36372560.60;1229.00;" +
+                DateUtils.localDateTime2StringStyle3(now) + "~";
     }
 
     private String realDataBodyContent(LocalDateTime now, SinkInfo info) {
