@@ -145,7 +145,7 @@ public class DrainageInfoServiceImpl extends ServiceImpl<DrainageInfoMapper, Dra
         //.append(SENSOR_TYPE_YSL).append(";")
         //.append("0").append(";");
         content.append(StringUtils.doubleTypeString(0, 100)).append(";");
-        content.append("00000000;");
+        content.append("0;");
         content.append("800.0;");
         content.append(DateUtils.localDateTime2StringStyle2(now));
         content.append("~");

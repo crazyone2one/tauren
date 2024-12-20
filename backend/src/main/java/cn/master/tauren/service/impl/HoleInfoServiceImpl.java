@@ -102,7 +102,7 @@ public class HoleInfoServiceImpl extends ServiceImpl<HoleInfoMapper, HoleInfo> i
     }
 
     private String realDataBodyContent(LocalDateTime now, HoleInfo holeInfo) {
-        return holeInfo.getId() + ";" + "00000000;"
+        return holeInfo.getId() + ";" + "0;"
                 + StringUtils.doubleTypeString(0, 30) + ";"
                 + StringUtils.doubleTypeString(0, 30) + ";"
                 + DateUtils.localDateTime2StringStyle2(now) + "~";

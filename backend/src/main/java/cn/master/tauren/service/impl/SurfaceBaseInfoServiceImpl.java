@@ -65,7 +65,7 @@ public class SurfaceBaseInfoServiceImpl extends ServiceImpl<SurfaceBaseInfoMappe
         content.append(surfaceBaseInfo.getId()).append(";")
                 .append(StringUtils.doubleTypeString(0, 20)).append(";")
                 .append(StringUtils.doubleTypeString(0, 20)).append(";")
-                .append("00000000").append(";");
+                .append("0").append(";");
         content.append(DateUtils.localDateTime2StringStyle2(now));
         content.append("~");
         return content;
